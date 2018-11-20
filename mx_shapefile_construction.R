@@ -4,16 +4,18 @@ rm(list = ls())
 gc() # garbage collection
 
 # libraries
-library(readxl)
-library(raster)
-library(parallel)
-library(sf)
-library(velox)
-library(rgdal)
-library(maps)
-library(mapdata)
-library(ggplot2)
-library(rgeos)
+local.lib = '/home/mm2535/R/x86_64-pc-linux-gnu-library'  # path to library on SDL1
+library(readxl, lib=local.lib)
+library(sp, lib=local.lib)
+library(raster, lib=local.lib)
+library(parallel, lib=local.lib)
+library(sf, lib=local.lib)
+library(velox, lib=local.lib)
+library(rgdal, lib=local.lib)
+library(maps, lib=local.lib)
+library(mapdata, lib=local.lib)
+library(ggplot2, lib=local.lib)
+library(rgeos, lib=local.lib)
 
   
 ##################### SHAPEFILE MEXICO
