@@ -14,6 +14,8 @@ library(velox, lib=local.lib)
 library(rgdal, lib=local.lib)
 library(maps, lib=local.lib)
 library(mapdata, lib=local.lib)
+library(crayon, lib=local.lib)
+library(withr, lib=local.lib)
 library(ggplot2, lib=local.lib)
 library(rgeos, lib=local.lib)
 
