@@ -17,8 +17,12 @@ library(rgeos)
 
   
 ##################### SHAPEFILE MEXICO
-setwd('/home/mario/Documents/environment_data/mexican_shapefiles/')
-tmp = '/home/mario/Documents/environment_data/mexican_shapefiles/tmp_folder'
+#setwd('/home/mario/Documents/environment_data/mexican_shapefiles/')
+#tmp = '/home/mario/Documents/environment_data/mexican_shapefiles/tmp_folder'
+
+setwd('/home/mm2535/documents/data/immigration_data')
+tmp = '/home/mm2535/documents/data/immigration_data/tmp_folder'
+
 all.files = list.files(pattern='.zip') # only zip files
 if(! 'mx_sh' %in% list.files()) dir.create('mx_sh') # create directory to store MX shapefiles
 
