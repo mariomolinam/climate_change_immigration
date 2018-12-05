@@ -6,12 +6,18 @@ The key variable upon which data merging relies is the geocode for Mexican local
 
 ---
 
-We provide information for the task performed by each file. Importantly, these files assume that that climate change data have been downloaded and stored in specific local paths. 
+We provide information for the task performed by each file. Importantly, these files assume that climate change data have been downloaded and stored in specific local paths. 
 
 - `master.R`: 
-  * This is the master file that calls all the other files. ⋅⋅
-  * It contains all libraries and all paths that are used for the data extraction and storage. ⋅⋅
+  * This is the master file that calls all the other files.
+  * It contains all libraries and all paths that are used for the data extraction and storage.
 
-- `mx_shapefile_construction.R`: It uses shapefiles for each Mexican state (taken from INEGI) and construct a Mexican shapefile that contains all urban and rural localities in great detail. It includes all blocks (i.e. manzanas) from urban areas. It assumes that `.zip` files were already downloaded and stored locally.
+- `mx_shapefile_construction.R`: 
+  * It uses shapefiles for each Mexican state (taken from INEGI) and construct a Mexican shapefile that contains all urban and rural localities in great detail. 
+  * It includes all blocks (i.e. manzanas) from urban areas. 
+  * It assumes that `.zip` files were already downloaded and stored locally.
 
-- `subset_polygons_mx_hf.R`: It reads human footprint files (in `.tif` format) and construct a multi raster. Then 
+- `subset_polygons_mx_hf.R`: 
+  * It reads human footprint files (in `.tif` format) and construct a multi raster object. These files contain human footprints from all over the world in 1km^2 grid. 
+  * Then, it loops over all `.zip` files and extract spatial information from the state-level Mexican shapefiles (not block-level).
+  * Finally, it 
