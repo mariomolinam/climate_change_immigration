@@ -25,8 +25,15 @@ We provide information for the task performed by each file. Importantly, these f
 - `extract_geocode_mx_sh.R`: 
   * It extracts MMP geocodes (the code assumes that MMP data exists).
   * It creates geocodes for all Mexican localities combining entity (i.e. state), municipality, and locality codes.
-  * It checks whether all MMP geocodes exists in geocodes from Mexican shapefiles (block-level). **UPDATE: there are 4 missing geocodes that need to be recovered** (please change or remove when this is done).
+  * It checks whether all MMP geocodes exists in geocodes from Mexican shapefiles (block-level). **UPDATE: there are 4 missing geocodes that need to be recovered (please change or remove when this is done)**.
   
 - `hf2MMP.R`: 
-  *
+  * It loops through all MMP geocodes and extract human footprint information for each locality from folder `state_level_footprints/`. 
+  * At each iteration, it extracts values using weights, so that a fraction of the grid value is considered when only a portion of the polygon overlaps the grid. 
+  * Each geocode generally contains many blocks and it therefore saves this information in a `.rds` file.
+  * Lastly, it computes a weighted average that is then assigned to the MMP gecode.
+  * It creates a new MMP file `mmp_w_footprint.csv`.
+  
+- `prcp_mx.R`: 
   * 
+  
