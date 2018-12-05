@@ -18,6 +18,6 @@ We provide information for the task performed by each file. Importantly, these f
   * It assumes that `.zip` files were already downloaded and stored locally.
 
 - `subset_polygons_mx_hf.R`: 
-  * It reads human footprint files (in `.tif` format) and construct a multi raster object. These files contain human footprints from all over the world in 1km^2 grid. 
+  * It reads human footprint files (in `.tif` format) and construct a multi raster object. These files contain human footprints from all over the world in 1km$^2$ grid. 
   * Then, it loops over all `.zip` files and extract spatial information from the state-level Mexican shapefiles (not block-level).
   * Finally, it 
