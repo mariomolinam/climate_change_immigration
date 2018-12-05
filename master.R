@@ -58,17 +58,26 @@ setwd( path.git )
 source('subset_polygons_mx_hf.R')
 
 ##################################################################################################
-# Extract geocodes for Mexican localities. It loads Mexico's shapefile, which is very large, to
-# create geocodes that combine ent, mun, and loc. Rural localities have their own geocode.
+# Extract geocodes from MMP data for Mexican localities. 
+# It loads Mexico's shapefile (which is very large)
+# to create geocodes that combine ent, mun, and loc. Rural localities have their own geocode.
 setwd( path.git )
 source('extract_geocode_mx_sh.R')
 
+##################################################################################################
+# Human footprints are added to MMP based on matching geocodes extracted in "extract_geocode_mx_sh.R".
+# This file also relies on objects created in "extract_geocode_mx_sh.R".
+setwd( path.git )
+source("hf2MMP.R")
 
-# Precipitation
+##################################################################################################
+# Daily precipitacions are added to MMP based on matching gecodes extracted in "extract_geocode_mx_sh.R".
+# 
 setwd( path.git )
 source("prcp_mx.R")
 
-
-
+#
+setwd( path.git )
+source("prcp2MMP.R")
 
 
