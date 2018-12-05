@@ -9,7 +9,6 @@ The key variable upon which data merging relies is the geocode for Mexican local
 We provide information for the task performed by each file. Importantly, these files assume that that climate change data have been downloaded and stored in specific local paths. 
 
 - `master.R`: 
-
   * This is the master file that calls all the other files. ⋅⋅
   * It contains all libraries and all paths that are used for the data extraction and storage. ⋅⋅
 
