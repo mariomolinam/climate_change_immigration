@@ -8,7 +8,7 @@ store.dir = paste0(path.shapefiles, 'state_level_prcp/')
 path.mx_sh = paste0(path.shapefiles, 'mx_sh/.')
 all.states = list.files(path.mx_sh)
 mx_sh.unique = unique(sub("[.].+", "", all.states))
-mx_sh.unique = mx_sh.unique[26:32]
+mx_sh.unique = mx_sh.unique
 
 # get all years for prcp files
 prcp.years = as.character(seq(1980, 2017,1))
@@ -45,16 +45,15 @@ for(st in mx_sh.unique){
     prcp.mx = crop(r, extent(r.proj) )
     
     # store prcp file
-    prcp.mx.path = paste0(new.dir, '/', st,'_', y,".rds")
-    saveRDS(object=prcp.mx, file=prcp.mx.path)
+    prcp.mx.path = paste0(new.dir, '/', st,'_', y,".tif")
+    outfile = writeRaster(prcp.mx, filename=prcp.mx.path, format="GTiff", overwrite=TRUE,options=c("INTERLEAVE=BAND","COMPRESS=LZW"))
+    # saveRDS(object=prcp.mx, file=prcp.mx.path)
     
     # remove files and run garbage collector
-    rm(r, r.proj, prcp.mx)
-    gc()
+    rm(r, r.proj, prcp.mx, outfile); gc()
   }
   # remove files and run garbage collector
-  rm(mx)
-  gc()
+  rm(mx); gc()
 }
 
 
