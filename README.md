@@ -18,6 +18,15 @@ We provide information for the task performed by each file. Importantly, these f
   * It assumes that `.zip` files were already downloaded and stored locally.
 
 - `subset_polygons_mx_hf.R`: 
-  * It reads human footprint files (in `.tif` format) and construct a multi raster object. These files contain human footprints from all over the world in 1km$^2$ grid. 
-  * Then, it loops over all `.zip` files and extract spatial information from the state-level Mexican shapefiles (not block-level).
-  * Finally, it 
+  * It reads human footprint files (in `.tif` format) and construct a multi raster object. These files contain human footprints from all over the world in a 1km x 1km grid. 
+  * It loops over all `.zip` files and extract spatial information from the state-level Mexican shapefiles (not block-level, as in `mx_shapefile_construction.R`).
+  * Finally, it extracts human footprint information for all Mexican states and stores it a local folder named `state_level_footprints` as separate files (one for each state). 
+  
+- `extract_geocode_mx_sh.R`: 
+  * It extracts MMP geocodes (the code assumes that MMP data exists).
+  * It creates geocodes for all Mexican localities combining entity (i.e. state), municipality, and locality codes.
+  * It checks whether all MMP geocodes exists in geocodes from Mexican shapefiles (block-level). **UPDATE: there are 4 missing geocodes that need to be recovered** (please change or remove when this is done).
+  
+- `hf2MMP.R`: 
+  *
+  * 
