@@ -10,8 +10,8 @@ We provide information for the task performed by each file. Importantly, these f
 
 - `master.R`: 
 
-⋅⋅ -This is the master file that calls all the other files. ⋅⋅
-⋅⋅ -It contains all libraries and all paths that are used for the data extraction and storage. ⋅⋅
+⋅⋅ This is the master file that calls all the other files. ⋅⋅
+⋅⋅ It contains all libraries and all paths that are used for the data extraction and storage. ⋅⋅
 
 - `mx_shapefile_construction.R`: It uses shapefiles for each Mexican state (taken from INEGI) and construct a Mexican shapefile that contains all urban and rural localities in great detail. It includes all blocks (i.e. manzanas) from urban areas. It assumes that `.zip` files were already downloaded and stored locally.
 
