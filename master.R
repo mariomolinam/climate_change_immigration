@@ -43,10 +43,9 @@ library(parallel)
 ####
 path.footprint = "/home/mario/Documents/environment_data/humanfootprint/"
 path.shapefiles = "/home/mario/Documents/environment_data/mexican_shapefiles/"
-# path.shapefiles = "/media/mario/Seagate Backup Plus Drive/mexican_shapefiles/"
 path.ra_filiz = "/home/mario/mm2535@cornell.edu/projects/ra_filiz"
 path.git = "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration"
-path.prcp = "/home/mario/Documents/environment_data/prec_na/data"
+path.daymet = "/media/mario/Seagate Backup Plus Drive/daymet_data"  # in external drive
 
 
 ##################################################################################################

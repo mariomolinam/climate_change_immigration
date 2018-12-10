@@ -41,6 +41,7 @@ cat('Done!', '\n')
 missing.geo = mmp$geocode[ ! mmp$geocode %in% mx.loc@data$geocode ]
 if( length(missing.geo) > 0 ) cat('\n', 'Missing geocodes:', missing.geo, '\n') 
 
-
-
+# save shapefile for MMP Mexican localities only
+mx.loc.mmp = subset(mx.loc, geocode %in% mmp$geocode)
+writeOGR(obj=mx.loc.mmp, dsn='.', layer='mx_localities_mmp', driver = 'ESRI Shapefile') 
 
