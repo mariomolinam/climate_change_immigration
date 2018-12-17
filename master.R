@@ -33,9 +33,13 @@ library(parallel)
 library(sf)
 library(velox)
 library(rgdal)
+library(rgeos)
 library(maps)
 library(mapdata)
 library(parallel)
+library(data.table)
+library(vioplot)
+library(RColorBrewer)
 ##################################################################################################
 
 
@@ -66,19 +70,25 @@ setwd( path.git )
 source('extract_geocode_mx_sh.R')
 
 ##################################################################################################
-# Human footprints are added to MMP based on matching geocodes extracted in "extract_geocode_mx_sh.R".
-# This file also relies on objects created in "extract_geocode_mx_sh.R".
+# Human footprints are added to MMP based on matching geocodes extracted in 
+# "extract_geocode_mx_sh.R". This file also relies on objects created in "extract_geocode_mx_sh.R".
 setwd( path.git )
 source("hf2MMP.R")
 
 ##################################################################################################
-# Daily precipitacions are added to MMP based on matching gecodes extracted in "extract_geocode_mx_sh.R".
-# 
+# Daily climate information is added to MMP based on matching geocodes extracted in 
+# "extract_geocode_mx_sh.R"
 setwd( path.git )
-source("prcp_mx.R")
+source("daymet_extraction.R")
 
-#
+##################################################################################################
+# Create aggregate measure for MMP localities and csv files with climate information. It uses
+# files from external drive
 setwd( path.git )
-source("prcp2MMP.R")
+source("climate_MMP.R")
 
+##################################################################################################
+# Create plots based on human footprint and climate information
+setwd( path.git )
+source("create_plots.R")
 

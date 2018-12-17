@@ -143,8 +143,9 @@ for(g in 1:length(unique.geo)){
   gc()
 }
 
-
 stop = Sys.time()
 print(stop - start)
 
-#
+
+
+
