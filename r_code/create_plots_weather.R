@@ -96,10 +96,6 @@ mtext('MMP Localities - Density Distribution for Human Footprints (1993-2009)', 
 dev.off()
 
 
-plot(density(d[,2]), add=TRUE)
-hist(d[,2])
-
-
 #######################################################
 ##############################  C L I M A T E 
 #######################################################
