@@ -45,12 +45,13 @@ months = c("jan", "feb", "mar", "apr",
            "sep", "oct", "nov", "dec")
 year.month = c()
 for(y in years) year.month = c(year.month, paste0(months, "-", y))
+year.month = paste0("tmin-",year.month)
 
 colnames(community.dev.mean) = c("geocode", year.month)
 
 # save community-level norm deviation between 1980 and 2017
 setwd(path.mmp)
-write.csv(community.dev.mean, "tmin_monthly_dev-norm_1980-2017.csv")
+write.csv(community.dev.mean, "tmin_monthly_dev-norm_1980-2017.csv", row.names = FALSE)
 
 # create plot for rain
 setwd(path.git)
