@@ -31,19 +31,21 @@ def select_columns(data):
             "usyr1", # first year of migration
             "migf",
             "age",
+            "sex",
             "mxmig", # whether they migrated in mexico until this year
+            "primary", # if there is a school
+            "secondary", # if there is a secondary school
+
             "totmighh", # total number of prior U.S. migrants in the household (up until that year)
-            "lnvland_nr", # log(value of land) — excluding that bought by remittances
             "tbuscat", # whether hh owns a business
             "troom", # number of rooms in properties household owns
+            "lnvland_nr", # log(value of land) — excluding that bought by remittances
+            "dprev", # prevalence of migration in community (share of people who have ever migrated to the U.S. up until that year)
             "agrim", # share of men working in agriculture in community
             "minx2", # share of people earning twice the minimum wage or more
-            "dprev", # prevalence of migration in community (share of people who have ever migrated to the U.S. up until that year)
             "metrocat", # metropolitan status of community
             "ejido", # collective land system (0/1)
             "lnpop", # log of population size in community
-            "primary", # if there is a school
-            "secondary", # if there is a secondary school
             "bank",  # in community
             "visaaccs", # visa accessibility to the U.S. in year
             "infrate",  # inflation in Mexico in year
@@ -59,7 +61,7 @@ def select_columns(data):
 
 # select columns and save as csv file
 subset = select_columns(d)
-subset.to_csv(path_data + "/ind161_w_env-subset.csv")
+subset.to_csv(path_data + "/ind161_w_env-subset.csv", index=False)
 
 
 
@@ -76,7 +78,7 @@ def create_test_set(data, seed=50):
     data_test.to_csv(path_data + file_test)
     # train set
     file_train = "/ind161_train_set.csv"
-    data_train.to_csv(path_data + file_train)
+    data_train.to_csv(path_data + file_train, index=False)
     # message
     message = "Test and train sets created!"
     return message
