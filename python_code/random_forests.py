@@ -12,35 +12,9 @@ import pandas as pd
 import numpy as np
 
 
-# paths
-path_data = "/home/mario/Documents/environment_data/mmp_data"
-path_git = "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration"
 
 
-# load data
-filename = path_data + "/ind161_train_set.csv"
-tr = pd.read_csv(filename, dtype="str")
-tr = tr.sort_values(by=["persnum", "year"])
 
-tr.loc[ tr.persnum=="100013" ,["persnum", "year", "migf"]].head(20)
-
-################################################################################
-###   V A R I A B L E   C R E A T I O N
-################################################################################
-
-# create DEPENDENT VARIABLE:
-#         - based on person-year (persnum-year) observation
-#         - keep individual history up to first migration,
-#               then drop the rest of person-year observations
-
-# remove all observation that has not mirated between 2019 and 1985
-idx_logical = ( (tr.usyr1 >= "1985") & (tr.usyr1 <= "2019") ) | (tr.usyr1 == '8888')
-tr = tr.loc[ idx_logical.values, :  ]
-
-
-# remove all observations whose "year" > "usyr1"
-idx_logical =  tr.year <= tr.usyr1
-tr = tr.loc[idx_logical, ]
 
 # create first migration variable
 tr = tr.assign(first_mig = np.where(tr["usyr1"]=='8888', 0, 1) )
@@ -56,67 +30,6 @@ for item in weather:
     tr = pd.merge(tr, weather_mmp, how="left", on="geocode")
     break
 
-#####################################################################
-# V A R I A B L E S   (R E L A B E L)
-#####################################################################
-
-####  S O C I O  -  D E M O G R A P H I C S
-################################################
-# sex: female/male
-tr = tr.assign(sex = pd.get_dummies(tr.sex).female)
-# if there is primary school
-tr = tr.assign(primary = pd.get_dummies(tr.primary).yes)
-# if there is secondary school
-tr = tr.assign(secondary = pd.get_dummies(tr.secondary).yes)
-# mexican migration
-tr = tr.assign(mxmig = pd.get_dummies(tr.mxmig).yes)
-# age
-tr = tr.assign(age = tr.age.astype(int))
-# age squared
-tr = tr.assign(age2 = tr.age**2)
-# total migrants in household
-tr = tr.assign(totmighh = tr.totmighh.astype(int))
-# number of rooms in household
-tr = tr.assign(troom = tr.troom.astype(int))
-# wether hh owns a business
-tr = tr.assign(tbuscat = pd.get_dummies(tr.tbuscat).yes)
-# prevalenve of migration in the community
-tr = tr.assign(dprev = tr.dprev.astype(float))
-# value of land (log)
-tr = tr.assign(lnvland_nr = tr.lnvland_nr.astype(float))
-# share of main working in agriculture
-tr = tr.assign(agrim = tr.agrim.astype(float))
-# share of people earning twice minimum wage
-tr = tr.assign(minx2 = tr.minx2.astype(float))
-# metropolitan status
-tr[["metropolitan", "rancho", "small urban", "town"]] = pd.get_dummies(tr.metrocat)
-# population size (lnpop)
-tr = tr.assign(lnpop = tr.lnpop.astype(float))
-# ejido
-tr = tr.assign(ejido = pd.get_dummies(tr.ejido).yes)
-# bank
-tr = tr.assign(bank = pd.get_dummies(tr.bank).yes)
-# visaaccs
-tr = tr.assign(visaaccs = tr.visaaccs.astype(float))
-# infrate: inflation per year
-tr = tr.assign(infrate = tr.infrate.astype(float))
-# mxminwag: minimum wage
-tr = tr.assign(mxminwag = tr.mxminwag.astype(float))
-# mxunemp: unemployment
-tr = tr.assign(mxunemp = tr.mxunemp.astype(float))
-# usavwage: USA average wage for low skill labor
-tr = tr.assign(usavwage = tr.usavwage.astype(float))
-# log trade mexico-USA
-tr = tr.assign(lntrade = tr.lntrade.astype(float))
-# distance to US (log)
-tr = tr.assign(logdist = tr.logdist.astype(float))
-
-####  W E A T H E R   I N F O
-################################################
-# deviation from norm: 1980 lag
-tr = tr.assign(prcp_1980 = tr["prcp-1980"].astype(float))
-# deviation from norm: 1983 lag
-tr = tr.assign(prcp_1983 = tr["prcp-1983"].astype(float))
 
 
 #####################################################################
