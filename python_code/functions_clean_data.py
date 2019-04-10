@@ -31,7 +31,6 @@ def select_columns(data):
             "mxmig",     # whether they migrated in mexico until this year
             "primary",   # if there is a school
             "secondary", # if there is a secondary school
-
             "totmighh",  # total number of prior U.S. migrants in the household (up until that year)
             "tbuscat",   # whether hh owns a business
             "troom",     # number of rooms in properties household owns
@@ -135,39 +134,55 @@ def keep_five_person_year(mmp_data):
     return mmp_data_five
 
 
-def attach_weather_by_geocode(mmp_data, w_data):
+def attach_weather_5_year_lags(mmp_data, w_data):
     """
     Input:  mmp_data: pandas dataframe (mmp).
             w_data: list of strs (with name of weather file).
 
-    Task:   First, reset mmp_data indices.
-            Second, read w_data file.
-            Third, get weather name variable (e.g. prcp, tmax)
-            Fourth, transform weather_data from wide to long format
-            Fifth, merge mmp_data with weather long format.
+    Task:   1. reset mmp_data indices.
+            2. read w_data file.
+            3. get weather name variable (using name of file)
+            4. loop through range(5) to create 5 lag variables (including lag 0)
+            5. get lag variable using shift function
+            6. transform weather_data from wide to long format
+            7. merge mmp_data_weather with weather_long long format.
 
-    Return: pandas dataframe: merged mmp_data with weather info in long format
+    Return: pandas dataframe - merged mmp_data with weather info in long format
     """
     # reset index mmp_data to geocode and year because weather varies by community
     mmp_data_weather = mmp_data.reset_index()
-
-    # mmp_data.set_index(["geocode", "year"], inplace=True)
     for w in w_data:
         # read weather data
         filename = path_data + "/" + w
         weather = pd.read_csv(filename, dtype="str")
         weather.drop('state', axis=1, inplace=True) # drop state column
         # weather variable name
-        weather_name = re.sub("\d+", "", weather.iloc[:,3].name)[:-1]
-        # from wide format to long format
-        weather_long = pd.melt(weather, id_vars="geocode", var_name="year",value_name=weather_name)
-        # remove weather name from year variable
-        weather_long["year"].replace(regex=True,inplace=True,to_replace=r'\D',value=r'')
-        # set index: geocode and year
-        # weather_long.set_index(["geocode", "year"], inplace=True)
-        # merge
-        mmp_data_weather = pd.merge(mmp_data_weather, weather_long, how="inner", on=["geocode", "year"])
-
+        weather_name = re.sub("mmp.+", "", w)[:-1]
+        # loop for lags
+        for y in range(5):
+            # column name
+            lag_name = "lag_t" + str(y)
+            weather_lag_name = weather_name + '_' + lag_name
+            # get lag of weather
+            weather_lag = weather.loc[:,weather.columns[1:]].shift(y, axis=1)
+            weather_lag = weather_lag.assign(geocode=weather.geocode)
+            # from wide format to long format
+            weather_long = pd.melt( weather_lag,
+                                    id_vars="geocode",
+                                    var_name="year",
+                                    value_name=weather_lag_name )
+            # remove weather name from year variable
+            weather_long["year"].replace( regex=True,
+                                          inplace=True,
+                                          to_replace=r'\D',
+                                          value=r'')
+            # set index: geocode and year
+            # weather_long.set_index(["geocode", "year"], inplace=True)
+            # merge
+            mmp_data_weather = pd.merge( mmp_data_weather,
+                                         weather_long,
+                                         how="left",
+                                         on=["geocode", "year"])
     return mmp_data_weather
 
 
@@ -200,6 +215,16 @@ def create_test_set(data, seed=50):
     return message
 
 def relabel_variables(data):
+    """
+    Input: pandas dataframe (mmp).
+
+    Task: Relabel variables.
+            - Some factors variables are transformed inot dummies.
+            - Other variables are transformed from str to float or int.
+            - Weather variables are transformed to float.
+
+    Return: pandas dataframe.
+    """
     ####  S O C I O  -  D E M O G R A P H I C S
     ################################################
     data = data.assign( sex = pd.get_dummies(data.sex).female,           # sex: female/male
@@ -232,7 +257,51 @@ def relabel_variables(data):
 
     ####  W E A T H E R
     ################################################
-    weather_measures = ['prcp_x', 'tmax_x', 'norm_%-tmax', 'prcp_y', 'spell-tmax', 'tmax_y', 'tmax', 'norm_%-prcp', 'prcp']
+    weather_measures = [ 'crude_raw_prcp_monthly-average_lag_t0',
+                         'crude_raw_prcp_monthly-average_lag_t1',
+                         'crude_raw_prcp_monthly-average_lag_t2',
+                         'crude_raw_prcp_monthly-average_lag_t3',
+                         'crude_raw_prcp_monthly-average_lag_t4',
+                         'crude_raw-tmax_monthly-average_lag_t0',
+                         'crude_raw-tmax_monthly-average_lag_t1',
+                         'crude_raw-tmax_monthly-average_lag_t2',
+                         'crude_raw-tmax_monthly-average_lag_t3',
+                         'crude_raw-tmax_monthly-average_lag_t4',
+                         'norm_percent_short-term_tmax_lag_t0',
+                         'norm_percent_short-term_tmax_lag_t1',
+                         'norm_percent_short-term_tmax_lag_t2',
+                         'norm_percent_short-term_tmax_lag_t3',
+                         'norm_percent_short-term_tmax_lag_t4',
+                         'norm_deviation_longterm_lag_t0',
+                         'norm_deviation_longterm_lag_t1',
+                         'norm_deviation_longterm_lag_t2',
+                         'norm_deviation_longterm_lag_t3',
+                         'norm_deviation_longterm_lag_t4',
+                         'warm_spell_tmax_lag_t0',
+                         'warm_spell_tmax_lag_t1',
+                         'warm_spell_tmax_lag_t2',
+                         'warm_spell_tmax_lag_t3',
+                         'warm_spell_tmax_lag_t4',
+                         'crude_above30-tmax_monthly-average_lag_t0',
+                         'crude_above30-tmax_monthly-average_lag_t1',
+                         'crude_above30-tmax_monthly-average_lag_t2',
+                         'crude_above30-tmax_monthly-average_lag_t3',
+                         'crude_above30-tmax_monthly-average_lag_t4',
+                         'norm_deviation_short-term_tmax_lag_t0',
+                         'norm_deviation_short-term_tmax_lag_t1',
+                         'norm_deviation_short-term_tmax_lag_t2',
+                         'norm_deviation_short-term_tmax_lag_t3',
+                         'norm_deviation_short-term_tmax_lag_t4',
+                         'norm_percent_short-term_prcp_lag_t0',
+                         'norm_percent_short-term_prcp_lag_t1',
+                         'norm_percent_short-term_prcp_lag_t2',
+                         'norm_percent_short-term_prcp_lag_t3',
+                         'norm_percent_short-term_prcp_lag_t4',
+                         'norm_deviation_short-term_prcp_lag_t0',
+                         'norm_deviation_short-term_prcp_lag_t1',
+                         'norm_deviation_short-term_prcp_lag_t2',
+                         'norm_deviation_short-term_prcp_lag_t3',
+                         'norm_deviation_short-term_prcp_lag_t4' ]
     data.loc[:,weather_measures] = data.loc[:,weather_measures].astype(float)
 
     return data
