@@ -3,6 +3,7 @@ import csv, random, os, re, gc
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
@@ -157,7 +158,7 @@ def multiple_RF(X_train, y_train, X_test, y_test):
     weights = [ "balanced",              # ratio:  49/1 (approx)
                 {0:0.01, 1: 1000},       # ratio:  100000/1
                 {0:0.01, 1: 1000000},    # ratio:  100000000/1
-                {0:0.01, 1: 10000000},   # ratio:  1000000000/1 
+                {0:0.01, 1: 10000000},   # ratio:  1000000000/1
                 {0:0.01, 1: 100000000}   # ratio:  10000000000/1
                 ]
     # loop through all weights
@@ -205,9 +206,51 @@ def random_forest_stat(X_train, y_train, X_test, y_test, weight):
     # dict for output
     output = { "pred_prob": pred_probs[:,1],
                "pred_test": pred_test,
-               "pred_train": pred_train
+               "pred_train": pred_train,
+               "rf_model": rf
              }
     return output
+
+
+def logistic_regression_stat(X_train, y_train, X_test, y_test):
+        """
+        Input:  Paramaters for Logistic Regression:
+
+                X_train, y_train, X_test, y_test: numpy arrays
+                weights: dict
+
+        Task: run logistic regression and predict:
+                - using train data (X_train)
+                - using test data (Y_test)
+
+        Return: dictionary
+        """
+
+        # random_grid = set_params_random_search()
+        lr = LogisticRegression( penalty="l2",
+                                 C=1e42,
+                                 n_jobs = 5 )
+        # determine search grid to find best paramaters using cross-validation (10 folds)
+        # lr_random = RandomizedSearchCV( estimator = lr,
+        #                           param_distributions = random_grid,
+        #                           n_iter=40,
+        #                           cv = 5,
+        #                           verbose=2,
+        #                           n_jobs = -1)
+        print("\tEstimating a logistic regression...")
+        lr.fit(X_train, y_train)
+        print("\tDone!")
+        # accuracy prediciton
+        pred_train = lr.predict(X_train)
+        pred_test = lr.predict(X_test)
+        pred_probs = lr.predict_proba(X_test) # probabilities
+        # dict for output
+        output = { "pred_prob": pred_probs[:,1],
+                   "pred_test": pred_test,
+                   "pred_train": pred_train,
+                   "lr_model": lr
+                 }
+        return output
 
 
 def ROC_curve_values(rf_output, y_test, model):

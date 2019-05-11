@@ -13,7 +13,7 @@ path_data = "/home/mario/Documents/environment_data/mmp_data"
 path_git = "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration"
 
 
-filename = path_data + "/" + "ind161_train_set.csv"
+filename = path_data + "/" + "ind161_train_set_LONG.csv"
 mmp_data_weather = pd.read_csv(filename)
 
 #####################################################################
@@ -28,10 +28,11 @@ weather_names = sorted( features_weather.keys() ) + ['sociodemographics only']
 # build ROC curve: save values here
 np_array_fpr = {}
 rf_output_dict = {}
+lr_output_dict = {}
 y_test_list  = []
 y_train_list = []
 
-for i in range(len(weather_names)+1):
+for i in range(len(weather_names)):
     print "\nSet: " + str(i)
     if i == 9:
         features_all = features_sociodem
@@ -53,14 +54,15 @@ for i in range(len(weather_names)+1):
     ###################################
     # run multiple Random Forest
     rf_output = func_rf.multiple_RF(X_train, y_train, X_test, y_test)
+    lr_output = func_rf.logistic_regression_stat(X_train, y_train, X_test, y_test)
     #
     features_set = "set_" + str(i)
     roc_values = func_rf.ROC_curve_values(rf_output, y_test, model=0)
     val_fpr, val_tpr, val_auc = roc_values
-
     # save values from RF models
     np_array_fpr[features_set] = [val_fpr, val_tpr, val_auc]
     rf_output_dict[features_set] = rf_output
+    lr_output_dict[features_set] = lr_output
     y_test_list.append(y_test)
     y_train_list.append(y_train)
 
@@ -81,7 +83,7 @@ plots.confusion_matrices(rf_output_dict, y_train_list, y_test_list)
 
 ###  I M P O R T A N C E S
 # Feature importance in predictive capacity
-importances_all = rf_all.feature_importances_
+importances_all = rf_output_dict['set_1'][0].feature_importances_
 std = np.std([tree.feature_importances_ for tree in rf_all.estimators_], axis=0)
 indices_all = np.argsort(importances_all)[::-1]
 features_sorted_all = [features_all[x] for x in indices_all]
