@@ -12,7 +12,8 @@ We use 3 forms of data structure:
 
 We provide information for the task performed by each file. Importantly, these files assume that climate change data have been downloaded and stored in specific local paths.
 
-- `function_RF`:
-  * This file implements and random forest model.
+- `functions_RF.py`:
+  * This file contains functions that implement a random forest model.
 
-- 
+- `functions_clean_data.py`:
+  * This file contains all functions that clean data and provide specific data structure.
