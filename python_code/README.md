@@ -6,8 +6,8 @@ Our weather data starts in 1980 until 2017. Therefore, we construct our primary 
 
 We use 3 forms of data structure:
   1) **person-year stucture WITHOUT augmentation (long format)**: each observation is person-year and the dependent variable is coded 1 at the year level, i.e., for the year of actual migration. For migrants, we keep the year of migration along with the 4 previous years
-  - **person-year stucture WITH augmentation (long format)**: each observation is person-year and the dependent variable is coded 1 at the year level, i.e., for the year of actual migration.
-  - **person stucture (wide format)**: each observation is person, the dependent variable is coded 1 if person is a migrant, and time-varying information is added as features.
+  2) **person-year stucture WITH augmentation (long format)**: each observation is person-year and the dependent variable is coded 1 at the year level, i.e., for the year of actual migration.
+  3) **person stucture (wide format)**: each observation is person, the dependent variable is coded 1 if person is a migrant, and time-varying information is added as features.
 
 
 We provide information for the task performed by each file. Importantly, these files assume that climate change data have been downloaded and stored in specific local paths.
