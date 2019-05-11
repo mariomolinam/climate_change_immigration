@@ -2,7 +2,9 @@
 
 This repository contains `python` code for the Cornell-based project on climate change and migration. This code builds a primary dataset that combines MMP data with climate data, and then subsets the data into training/validation and test.
 
-Our weather data starts in 1980 until 2017. Therefore, we construct our primary dataset by removing all observations whose year of migration is 1985 (for migrants) or whose year of survey is 1985   
+Our weather data starts in 1980 until 2017 and our data construction ensures that we have at least 5  
+
+we construct our primary dataset by removing all information that takes place before 1980.   
 
 We use 3 forms of data structure:
   1) **person-year stucture WITHOUT augmentation (long format)**: each observation is person-year and the dependent variable is coded 1 at the year level, i.e., for the year of actual migration. For migrants, we keep the year of migration along with the 4 previous years
