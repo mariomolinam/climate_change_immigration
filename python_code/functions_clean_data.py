@@ -56,26 +56,47 @@ def select_columns(data):
     return subset
 
 
-def select_data(mmp_data):
+def select_data(mmp_data, data_structure):
     """
     Input: pandas dataframe (mmp)
 
     Task: filter data based on relevant migration information:
-            1. People who migrated in or after 1985
+            1. People who migrated on or after 1985
             2. Info provided after year of 1st migration (usyr1)
+            3. People with info only after 1980 (migrants or non-migrants).
 
     Return: subset of pandas dataframe
     """
-    # FILTER 1: get all migrants who migrated in or after 1985
+
+    # FILTER 1: GET all MIGRANTS who migrated on or after 1985
     mmp_data = mmp_data.loc[ mmp_data.usyr1 >= "1985" , ]
 
-    # FILTER 2: remove all observations for which there is information
-    #           after the year of migration (usyr1 > year)
-    mmp_data = mmp_data.loc[ mmp_data.year <= mmp_data.usyr1 , ]
+    # FILTER 2: REMOVE all observations for which:
+    #           - data_structure != 'long_aug':
+    #                  there is information after the
+    #                  year of migration (usyr1 > year)
+    #           - data_structure == 'long_aug':
+    #                   there is information after the three years of
+    #                   year of migration (usyr1 > (year-2)). This allows for
+    #                   +2/-2 years around year of migration.
+    #
+    # This filter does NOT affect non-migrants
 
-    # FILTER 3: remove all observations that have observations before
-    #           our first year with weather information (1980)
+    if data_structure != "long_aug":
+        cond = mmp_data.year <= mmp_data.usyr1
+        mmp_data = mmp_data.loc[ cond , ]
+    else:
+        # allow for 2 extra years after migration year.
+        year = mmp_data.year.astype(int) - 2
+        year = year.astype(str)
+        cond = year <= mmp_data.usyr1
+        mmp_data = mmp_data.loc[ cond , ]
+
+    # FILTER 3: remove all observations (MIGRANTS and NON-MIGRANTS) that
+    #           have entries before our first year with weather
+    #           information (1980).
     mmp_data = mmp_data.loc[ mmp_data.year >= "1980" , ]
+
 
     return mmp_data
 
@@ -85,7 +106,8 @@ def correct_migrants(mmp_data):
     Input: pandas dataframe (mmp)
 
     Task: Correct for migrants who have a valid year listed in
-            "usyr1" but have a year earlier listed in survey
+            year of migration ("usyr1"!=8888) but have a year earlier
+            listed in survey ("year").
 
     Return: pandas dataframe
     """
@@ -94,7 +116,6 @@ def correct_migrants(mmp_data):
     subset = mmp_data.loc[ mmp_data.usyr1 != "8888", : ]
 
     # set multiIndex: "persnum", "year"
-    mmp_data_multi = mmp_data.set_index(["persnum", "year"])
     subset.set_index(["persnum", "year"], inplace=True)
 
     # check migrants with all 0 in "migf" and then obtain indices for persnum
@@ -106,6 +127,8 @@ def correct_migrants(mmp_data):
     t = subset.loc[list(subset_idx_persnum),:].groupby(level=0).apply(
           lambda grp: grp.index.get_level_values("year").max() )
 
+    # set multiIndex: "persnum", "year"
+    mmp_data_multi = mmp_data.set_index(["persnum", "year"])
     # loop through all persnum indices and max year and recode
     for x in range(t.shape[0]):
         mmp_data_multi.loc[(t.index[x], t[x]), "migf"] = "1"
@@ -114,11 +137,12 @@ def correct_migrants(mmp_data):
     return mmp_data_multi
 
 
-def keep_five_person_year(mmp_data):
+def keep_five_person_year(mmp_data, data_structure):
     """
     Input: pandas dataframe (mmp)
 
-    Task: Keep the 5 most recent years per person
+    Task:
+        - Keep the 5 most recent years per person
 
     Return: a pandas dataframe (mmp)
     """
@@ -134,12 +158,27 @@ def keep_five_person_year(mmp_data):
     return mmp_data_five
 
 
+def add_migrant_info(mmp_data, data_structure):
+    """
+    Input: mmp_data: pandas dataframe (mmp)
+
+    Task:
+        - Add 1 in migf variable for past info of migrants.
+        (i.e. rows that represent past info of migrants)
+    """
+
+    if data_structure == 'long_aug':
+    mmp_data.loc[ mmp_data.usyr1 != '8888', "migf" ] = "1"
+
+    return mmp_data
+
 def attach_weather_5_year_lags(mmp_data, w_data):
     """
     Input:  mmp_data: pandas dataframe (mmp).
             w_data: list of strs (with name of weather file).
 
-    Task:   1. reset mmp_data indices.
+    Task:
+            1. reset mmp_data indices.
             2. read w_data file.
             3. get weather name variable (using name of file)
             4. loop through range(5) to create 5 lag variables (including lag 0)
@@ -186,7 +225,22 @@ def attach_weather_5_year_lags(mmp_data, w_data):
     return mmp_data_weather
 
 
-def create_test_set(data, seed=50):
+def create_test_set(data, data_structure, seed=50):
+    """
+    Input:
+        data: pandas dataframe
+        data_structure: a string
+        seed: an integer
+
+    Task:
+        It creates training and test sets. Since migration is a rare event,
+        it stratifies the sample by prevalence of the event. More specifically,
+        it saves as test set 25% of non-migrants AND 25% of migrants.
+
+    Return:
+        It saves test and training sets as two separate csv files.
+        It returns a message saying whether this operation was successful.
+    """
 
     # NON-MIGRANTS
     # unique users
@@ -204,19 +258,48 @@ def create_test_set(data, seed=50):
     # build test and training sets
     data_test = data.loc[ data.persnum.isin(non_migrants_sub) | data.persnum.isin(migrants_sub) ,:]
     data_train = data.loc[ ~ ( data.persnum.isin(non_migrants_sub) |  data.persnum.isin(migrants_sub) ),: ]
+
     # save test set
-    file_test = "/ind161_test_set.csv"
-    data_test.to_csv(path_data + file_test)
+    file_test = "/ind161_test_set_" + data_structure + ".csv"
     # train set
-    file_train = "/ind161_train_set.csv"
+    file_train = "/ind161_train_set_" + data_structure + ".csv"
+
+    # save test set
+    data_test.to_csv(path_data + file_test)
+    # save training set
     data_train.to_csv(path_data + file_train, index=False)
+
     # message
     message = "Test and train sets created!"
     return message
 
+
+def structure_wide_or_long(mmp_data, data_structure):
+    """
+    Input: pandas dataframe
+
+    Task:
+        - Transform from long format to wide format
+
+    Return: pandas dataframe
+    """
+
+    ###################################
+    # NEEDS IMPLEMENTATION:
+    #   - transform long format to wide
+    #
+    # DELETE WHEN COMPLETED
+    ###################################
+    if data_structure == "wide":
+        # from long format to wide
+        pass
+
+    return mmp_data
+
+
 def relabel_variables(data):
     """
-    Input: pandas dataframe (mmp).
+    Input: pandas dataframe (mmp data).
 
     Task: Relabel variables.
             - Some factors variables are transformed inot dummies.
