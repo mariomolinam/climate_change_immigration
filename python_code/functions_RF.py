@@ -12,41 +12,95 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import average_precision_score
 
 
-def sociodemographics_features():
+def get_features(file):
     """
-    Input: None
+    Input:
+        - a pandas dataframe
+        - a string (file name)
 
     Task: Create list of sociodemographic features
 
-    Return: a list
+    Return: a dictionary with time constant, time varying, and weather variables.
     """
-    features_sociodem = [ "migf",
-                          "primary",
-                          "secondary",
-                          "mxmig",
-                          "age",
-                          "age2",
-                          "sex",
-                          "totmighh",
-                          "troom",
-                          "tbuscat",
-                          "dprev",
-                          "lnvland_nr",
-                          "agrim",
-                          "minx2",
-                          # "metropolitan",
-                          "rancho",
-                          "small urban",
-                          "town",
-                          "lnpop",
-                          "ejido",
-                          "bank",
-                          "visaaccs",
-                          "infrate",
-                          "mxminwag",
-                          "mxunemp",
-                          "usavwage",
-                          "lntrade" ]
+    # TIME CONSTANT
+    features_sociodem_constant = [
+        # "migf",      # whether migrant or not (regardless of year of first migration)
+        "primary",   # if there is a school
+        "secondary", # if there is a secondary school
+        "sex",
+        "totmighh",  # total number of prior U.S. migrants in the household (up until that year)
+        "tbuscat",   # whether hh owns a business
+        "troom",     # number of rooms in properties household owns
+        # "metropolitan",
+        "rancho",
+        "small urban",
+        "town",
+        "lnvland_nr",# log(value of land) — excluding that bought by remittances
+        "agrim",     # share of men working in agriculture in community
+        "bank",      # in community
+        "lnpop",     # log of population size in community
+        "ejido",     # collective land system (0/1)
+        "minx2",      # share of people earning twice the minimum wage or more
+        "logdist"    # distance of community to the U.S.
+    ]
+    # TIME VARYING
+    features_sociodem_varying = [
+          "age",
+          "age2",
+          "mxmig",     # whether they migrated in mexico until this year
+          "dprev",     # prevalence of migration in community (share of people who have ever migrated to the U.S. up until that year)
+          "visaaccs",  # visa accessibility to the U.S. in year
+          "infrate",   # inflation in Mexico in year
+          "mxminwag",  # min wage in mexico in year
+          "mxunemp",   # unemployment in Mexico
+          "usavwage",  # U.S. average wages for low-skill work in year
+          "lntrade"    # log of trade between MX-U.S.d
+    ]
+    # WEATHER VARIABLES and KEYS
+    weather_vars = [
+         'crude_raw_prcp_monthly-average',
+         'crude_raw-tmax_monthly-average',
+         'crude_above30-tmax_monthly-average',
+         'norm_deviation_longterm',
+         'norm_percent_short-term_tmax',
+         'norm_percent_short-term_prcp',
+         'norm_deviation_short-term_tmax',
+         'norm_deviation_short-term_prcp',
+         'warm_spell_tmax',
+    ]
+
+    weather_keys = [ 'crude_raw_prcp',
+                     'crude_raw_tmax',
+                     'crude_above30_tmax',
+                     'norm_dev_long',
+                     'norm_perc_short_tmax',
+                     'norm_perc_short_prcp',
+                     'norm_dev_short_tmax',
+                     'norm_dev_short_prcp',
+                     'warm_spell']
+
+    if "long_aug" in file:
+        weather_vars = { weather_keys[x]: weather_vars[x] for x in range(len(weather_vars)) }
+        features_sociodem = { "time_constant": features_sociodem_constant,
+                              "time_varying": features_sociodem_varying,
+                              "weather_vars": weather_vars }
+    elif "long_noaug" in file:
+        # rename weather variables
+        weather_vars = { weather_keys[x]: [ weather_vars[x] + '_t' + str(i) for i in range(5) ] for x in range(len(weather_vars)) }
+
+        features_sociodem = { "time_constant": features_sociodem_constant,
+                              "time_varying": features_sociodem_varying,
+                              "weather_vars": weather_vars }
+    else:
+        # rename weather variables
+        weather_vars = { weather_keys[x]: [ weather_vars[x] + '_t' + str(i) for i in range(5) ] for x in range(len(weather_vars)) }
+
+        # rename time_varying variables
+        features_sociodem_varying = [ name + "_t" + str(i) for i in range(5) for name in features_sociodem_varying ]
+
+        features_sociodem = { "time_constant": features_sociodem_constant,
+                              "time_varying": features_sociodem_varying,
+                              "weather_vars": weather_vars }
 
     return features_sociodem
 
@@ -122,25 +176,26 @@ def weather_features():
 
 def set_params_random_search():
     # Number of trees in random forest
-    n_estimators = [int(x) for x in np.linspace(start = 500, stop = 2000, num = 5)]
+    n_estimators = [int(x) for x in np.linspace(start = 100, stop = 2000, num = 200)]
     # Number of features to consider at every split
-    max_features = ['auto', 'sqrt']
+    # max_features = ['auto', 'sqrt']
     # Maximum number of levels in tree
-    max_depth = [int(x) for x in np.linspace(10, 110, num = 5)]
+    max_depth = [int(x) for x in np.linspace(5, 200, num = 50)]
     max_depth.append(None)
     # Minimum number of samples required to split a node
     # min_samples_split = [2, 5, 10]
     # Minimum number of samples required at each leaf node
     # min_samples_leaf = [1, 2, 4]
     # Method of selecting samples for training each tree
-    bootstrap = [True]
+    # bootstrap = [True]
     # Create the random grid
     random_grid = {'n_estimators': n_estimators,
-                   'max_features': max_features,
+                   # 'max_features': max_features,
                    'max_depth': max_depth,
                    # 'min_samples_split': min_samples_split,
                    # 'min_samples_leaf': min_samples_leaf,
-                   'bootstrap': bootstrap}
+                   # 'bootstrap': bootstrap
+                   }
     return random_grid
 
 
@@ -183,22 +238,28 @@ def random_forest_stat(X_train, y_train, X_test, y_test, weight):
 
     Return: dictionary
     """
-    # random_grid = set_params_random_search()
+    random_grid = set_params_random_search()
     rf = RandomForestClassifier( criterion = "entropy",
-                                n_estimators = 1000,
-                                max_depth = 30,
-                                class_weight = weight,
-                                n_jobs = 5 )
+                                 bootstrap = True,
+                                # n_estimators = 1000,
+                                # max_depth = 30,
+                                # class_weight = weight
+                                )
     # determine search grid to find best paramaters using cross-validation (10 folds)
-    # rf_random = RandomizedSearchCV( estimator = rf,
-    #                           param_distributions = random_grid,
-    #                           n_iter=40,
-    #                           cv = 5,
-    #                           verbose=2,
-    #                           n_jobs = -1)
-    print("\tEstimating a random forest...")
-    rf.fit(X_train, y_train)
-    print("\tDone!")
+    rf_random = RandomizedSearchCV( estimator = rf,
+                              param_distributions = random_grid,
+                              n_iter=50,
+                              cv = 5,
+                              verbose=2,
+                              random_state=466,
+                              n_jobs = -1)
+
+    print("\tEstimating a random forest with randomized grid search...")
+
+    rf_random.fit(X_train, y_train)
+
+    print("\tDone!\n")
+
     # accuracy prediciton
     pred_train = rf.predict(X_train)
     pred_test = rf.predict(X_test)

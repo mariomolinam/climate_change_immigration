@@ -92,26 +92,25 @@ def confusion_matrices(rf_output_dict, y_train_list, y_test_list):
                 # h = "Test set" + " - " + "model " + str(i+1)
                 cm.to_csv(filename, mode='a', index=["True = 0", "True = 1"], header=["Pred = 0", "Pred = 1"])
 
+
 def ROCcurve_models(rf_output_dict, y_test_list, model):
     # plot no skill
-plt.figure()
-plt.title("ROC Curve with cost ratio: 1,000,000,000:1")
-# plot the 45 degrees lines
-plt.plot([0, 1], [0, 1], linestyle='--', color="black")
-colors = [  "red", "maroon", "darkgoldenrod", "olivedrab", "blue",
-            "indigo", "darkorange", "cyan", "dodgerblue", "lawngreen"]
-for i in range(len(rf_output_dict)):
-    roc_values = ROC_curve_values(rf_output_dict["set_"+str(i)], y_test_list[i], model)
-    val_fpr, val_tpr, val_auc = roc_values
-    label_legend = weather_names[i] + " - (AUC: " + str(round(val_auc, 3)) + ")"
-    plt.plot(val_fpr,val_tpr, linestyle='-', color=colors[i], label=label_legend)
+    plt.figure()
+    plt.title("ROC Curve with cost ratio: 1,000,000,000:1")
+    # plot the 45 degrees lines
+    plt.plot([0, 1], [0, 1], linestyle='--', color="black")
+    colors = [  "red", "maroon", "darkgoldenrod", "olivedrab", "blue",
+                "indigo", "darkorange", "cyan", "dodgerblue", "lawngreen"]
+    for i in range(len(rf_output_dict)):
+        roc_values = ROC_curve_values(rf_output_dict["set_"+str(i)], y_test_list[i], model)
+        val_fpr, val_tpr, val_auc = roc_values
+        label_legend = weather_names[i] + " - (AUC: " + str(round(val_auc, 3)) + ")"
+        plt.plot(val_fpr,val_tpr, linestyle='-', color=colors[i], label=label_legend)
 
-# plt.plot(recall_socio, precision_socio, marker='.', color="b", label="Random Forest without prcp lags")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.legend(loc='lower right', frameon=False, fontsize=10)
-# plt.show()
-
-
-fig_name = path_git + "/results/ROC_curve_model_4.png"
-plt.savefig(fig_name, bbox_inches='tight')
+    # plt.plot(recall_socio, precision_socio, marker='.', color="b", label="Random Forest without prcp lags")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.legend(loc='lower right', frameon=False, fontsize=10)
+    # plt.show()
+    fig_name = path_git + "/results/ROC_curve_model_4.png"
+    plt.savefig(fig_name, bbox_inches='tight')
