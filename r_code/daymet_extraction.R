@@ -37,9 +37,11 @@ for( folder in daymet_folders){
     if(t==1) proj.r = ""
     
     cat('\n', 'Reading daymet file...', '\n')
+    
     # read prcp as raster brick
     file.path = paste0(folder,'/',all.files[t])
     r = brick(file.path)
+    
     # transform mx.loc.mmp only if projections are different.
     if( ! identical(proj.r, proj4string(r)) ) {
       # update projection

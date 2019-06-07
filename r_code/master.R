@@ -40,6 +40,7 @@ library(parallel)
 library(data.table)
 library(vioplot)
 library(RColorBrewer)
+library(ggmap)      # get geocodes with google (api key is needed)
 ##################################################################################################
 
 
@@ -91,4 +92,9 @@ source("climate_MMP.R")
 # Create plots based on human footprint and climate information
 setwd( path.git )
 source("create_plots.R")
+
+##################################################################################################
+# Extract geocodes from crossing points for Mexican municipalities
+setwd( path.git )
+source("extract_geocode_crossing_points.R")
 
