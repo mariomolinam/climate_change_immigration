@@ -2,7 +2,7 @@
 # select right mx communities for MMP
 #######################################################
 
-setwd(path.ra_filiz)
+setwd(path.git)
 
 # read MMP geo codes
 cross_pts = read_xlsx("CrossingPlace_GPSInfo.xlsx")
@@ -19,7 +19,7 @@ crossing_points_names = paste0(cross_pts$placename, ", Mexico")
 #########################################
 # use google maps to get crossing points at Mexican border
 crossing_filename = "crossing_points.csv"
-if( ! crossing_filename %in% list.files(path.ra_filiz)) {
+if( ! crossing_filename %in% list.files(path.git)) {
 
   # get google api key
   myAPIkey = readLines("google.api")
@@ -96,6 +96,28 @@ for( folder in daymet_folders){
     fwrite(x=geo.climate, file=file.name, append = TRUE)
     cat('Done!', '\n') 
   }
+}
+
+
+# solve issue with dataframe (data were repeated)
+setwd(path.daymet)
+file_type = c("prcp", "tmax", "tmin")
+for( type in file_type ){
+  files = list.files()[grep(paste0("crossing_weather_",type), list.files())]
+  one_file_crossing_points = data.frame(placename=cross_pts$placename)
+  for( f in 1:length(files)){
+    # read file
+    f_read = fread(files[f])
+    
+    # get first 25 rows (which is the number of unique crossing points)
+    f_read_sub = f_read[1:length(cross_pts$placename),]
+    
+    # update one weather file for crossing points
+    one_file_crossing_points = cbind(one_file_crossing_points, f_read_sub[,-c("placename")])
+  }
+  # write one weather file
+  filename = paste0("crossing_weather_",type,"_1980-2017.csv")
+  fwrite(one_file_crossing_points, filename)
 }
 
 

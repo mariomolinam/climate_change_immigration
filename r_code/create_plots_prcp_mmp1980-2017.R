@@ -118,6 +118,13 @@ write.csv(community.dev.mean.yearly, "prcp_yearly_dev-norm_1980-2017.csv", row.n
 ######  P L O T   
 # create plot for rain
 setwd(path.git)
+state.names = c("Aguascalientes", "Baja California del Norte", "Baja California del Sur", 
+                "Campeche", "Coahuila","Colima","Chiapas","Chihuahua", "Mexico City",
+                "Durango", "Guanajuato","Guerrero","Hidalgo","Jalisco",
+                "México","Michoacán","Morelos","Nayarit","Nuevo Leon", 
+                "Oaxaca","Puebla","Querétaro","Quintana Roo","San Luis Potosí", 
+                "Sinaloa","Sonora","Tabasco","Tamaulipas","Tlaxcala",
+                "Veracruz", "Yucatán", "Zacatecas")
 jpeg('./results/prcp_mmp_yearly_1980-2017.jpeg', height = 10000, width = 12500, res=400, pointsize=22)
 par(mfrow=c(12,12), mar=c(1.5,3.1,1,0.5))
 nrow = nrow(community.dev.mean.yearly)
@@ -150,7 +157,8 @@ for(comm in 1:nrow){
   # margin text
   mtext("Rain (mm/year)", side=2, line=2, cex=0.5)
   # mtext("Time", side=1, line=2, cex=0.6)
-  mtext(paste0("Community #", comm), side=3, cex=0.5)
+  st = as.numeric(prcp.mmp.yearly[comm,"state"])
+  mtext(paste0(state.names[st], " (#", comm,")"), side=3, cex=0.5)
   
   # legend
   legend(26, 1450, legend=c("1 sd", "2 sd"), col="red", lty=c(2,3), bty="n", cex = 0.3, lwd=c(0.5,0.3))
