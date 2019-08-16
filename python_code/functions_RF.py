@@ -365,7 +365,7 @@ def run_RF(file_names):
             # S T O R E   O U T P U T
             MODEL_OUTPUT[weather_names[i]] = {data_structure[f]: {"rf": rf_output, "lr": lr_output}}
 
-
+    return MODEL_OUTPUT
 
 
 
