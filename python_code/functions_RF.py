@@ -176,11 +176,11 @@ def weather_features():
 
 def set_params_grid_search():
     # Number of trees in random forest
-    n_estimators = [int(x) for x in np.linspace(start = 500, stop = 1500, num = 1)]
+    n_estimators = [int(x) for x in np.linspace(start = 500, stop = 1500, num = 21)]
     # Number of features to consider at every split
     # max_features = ['auto', 'sqrt']
     # Maximum number of levels in tree
-    max_depth = [int(x) for x in np.linspace(5, 40, num = 1)]
+    max_depth = [int(x) for x in np.linspace(5, 40, num = 16)]
     max_depth.append(None)
     # Minimum number of samples required to split a node
     # min_samples_split = [2, 5, 10]
