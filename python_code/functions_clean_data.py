@@ -176,6 +176,7 @@ def add_migrant_info(mmp_data, data_structure):
 
     return mmp_data
 
+
 def attach_weather_5_year_lags(mmp_data, w_data, data_structure):
     """
     Input:  mmp_data: pandas dataframe (mmp).

@@ -36,7 +36,7 @@ def get_features(file):
         "small urban",
         "town",
         "lnvland_nr",# log(value of land) — excluding that bought by remittances
-        "agrim",     # share of men working in agriculture in community
+        "agrim",     # TIME VARYING (CHANGE) # share of men working in agriculture in community
         "bank",      # in community
         "lnpop",     # log of population size in community
         "ejido",     # collective land system (0/1)
@@ -96,7 +96,7 @@ def get_features(file):
         weather_vars = { weather_keys[x]: [ weather_vars[x] + '_t' + str(i) for i in range(5) ] for x in range(len(weather_vars)) }
 
         # rename time_varying variables
-        features_sociodem_varying = [ name + "_t" + str(i) for i in range(5) for name in features_sociodem_varying ]
+        features_sociodem_varying = [ name + "_" + str(i) for i in range(5) for name in features_sociodem_varying ]
 
         features_sociodem = { "time_constant": features_sociodem_constant,
                               "time_varying": features_sociodem_varying,
@@ -174,13 +174,13 @@ def weather_features():
     return features_weather
 
 
-def set_params_random_search():
+def set_params_grid_search():
     # Number of trees in random forest
-    n_estimators = [int(x) for x in np.linspace(start = 100, stop = 2000, num = 200)]
+    n_estimators = [int(x) for x in np.linspace(start = 500, stop = 1500, num = 1)]
     # Number of features to consider at every split
     # max_features = ['auto', 'sqrt']
     # Maximum number of levels in tree
-    max_depth = [int(x) for x in np.linspace(5, 200, num = 50)]
+    max_depth = [int(x) for x in np.linspace(5, 40, num = 1)]
     max_depth.append(None)
     # Minimum number of samples required to split a node
     # min_samples_split = [2, 5, 10]
@@ -199,32 +199,7 @@ def set_params_random_search():
     return random_grid
 
 
-def multiple_RF(X_train, y_train, X_test, y_test):
-    """
-    Input: Paramaters for Random Forest:
-            X_train, y_train, X_test, y_test: numpy arrays
-
-    Task: create class weights and run random forest
-
-    Return: A list of dictionaries, where each dictionary
-            contains output for random forest.
-    """
-    # define class weights
-    weights = [ "balanced",              # ratio:  49/1 (approx)
-                {0:0.01, 1: 1000},       # ratio:  100000/1
-                {0:0.01, 1: 1000000},    # ratio:  100000000/1
-                {0:0.01, 1: 10000000},   # ratio:  1000000000/1
-                {0:0.01, 1: 100000000}   # ratio:  10000000000/1
-                ]
-    # loop through all weights
-    save_outputs = list()
-    for w in weights:
-        output = random_forest_stat(X_train, y_train, X_test, y_test, w)
-        save_outputs.append(output)
-    return save_outputs
-    #
-
-def random_forest_stat(X_train, y_train, X_test, y_test, weight):
+def random_forest_stat(X_train, y_train, weight):
     """
     Input:  Paramaters for Random Forest:
 
@@ -238,42 +213,71 @@ def random_forest_stat(X_train, y_train, X_test, y_test, weight):
 
     Return: dictionary
     """
-    random_grid = set_params_random_search()
+    # set parameters for grid search
+    random_grid = set_params_grid_search()
+    # build random forest classifier
     rf = RandomForestClassifier( criterion = "entropy",
                                  bootstrap = True,
-                                # n_estimators = 1000,
-                                # max_depth = 30,
-                                # class_weight = weight
+                                 # n_estimators = 800,
+                                 # max_depth = 12,
+                                 class_weight = weight
                                 )
     # determine search grid to find best paramaters using cross-validation (10 folds)
-    rf_random = RandomizedSearchCV( estimator = rf,
-                              param_distributions = random_grid,
-                              n_iter=50,
-                              cv = 5,
-                              verbose=2,
-                              random_state=466,
-                              n_jobs = -1)
+    rf_grid = RandomizedSearchCV( estimator = rf,
+                                  param_distributions = random_grid,
+                                  scoring = "balanced_accuracy", # accounts for imbalance in data
+                                  n_jobs = -1,
+                                  n_iter = 60,
+                                  cv = 5,
+                                  refit = True,
+                                  verbose=2,
+                                  random_state=466
+                                  )
+    # rf_grid = GridSearchCV( estimator = rf,
+    #                        param_grid = random_grid,
+    #                        scoring = "balanced_accuracy", # accounts for imbalance in data
+    #                        n_jobs = -1,
+    #                        # n_iter=15,
+    #                        cv = 5,
+    #                        refit = True,
+    #                        verbose=2
+    #                        )
+    print('.'*60)
+    print("\tEstimating a random forest with randomized grid search...\n")
+    # rf_random.fit(X_train, y_train)
+    # rf_random.best_params_
+    rf_grid.fit(X_train, y_train)
+    print("\n\tDone!\n\n")
+    print('.'*60)
+    return rf_grid
 
-    print("\tEstimating a random forest with randomized grid search...")
 
-    rf_random.fit(X_train, y_train)
+def multiple_RF(X_train, y_train):
+    """
+    Input: Paramaters for Random Forest:
+            X_train, y_train, X_test, y_test: numpy arrays
 
-    print("\tDone!\n")
+    Task: create class weights and run random forest
 
-    # accuracy prediciton
-    pred_train = rf.predict(X_train)
-    pred_test = rf.predict(X_test)
-    pred_probs = rf.predict_proba(X_test) # probabilities
-    # dict for output
-    output = { "pred_prob": pred_probs[:,1],
-               "pred_test": pred_test,
-               "pred_train": pred_train,
-               "rf_model": rf
-             }
-    return output
+    Return: A list of dictionaries, where each dictionary
+            contains output for random forest.
+    """
+    # define class weights
+    weights = [ "balanced_subsample",               # ratio:  49/1 (approx)
+                # {0:0.01, 1: 1000},                  # ratio:  100000/1
+                {0:0.01, 1: 1000000},               # ratio:  100000000/1
+                # # {0:0.01, 1: 10000000},              # ratio:  1000000000/1
+                {0:0.01, 1: 100000000}              # ratio:  10000000000/1
+                ]
+    # loop through all weights
+    save_outputs = list()
+    for w in weights:
+        output = random_forest_stat(X_train, y_train, w)
+        save_outputs.append(output)
+    return save_outputs
 
 
-def logistic_regression_stat(X_train, y_train, X_test, y_test):
+def logistic_regression_stat(X_train, y_train):
         """
         Input:  Paramaters for Logistic Regression:
 
@@ -286,38 +290,58 @@ def logistic_regression_stat(X_train, y_train, X_test, y_test):
 
         Return: dictionary
         """
-
-        # random_grid = set_params_random_search()
-        lr = LogisticRegression( penalty="l2",
-                                 C=1e42,
-                                 n_jobs = 5 )
-        # determine search grid to find best paramaters using cross-validation (10 folds)
-        # lr_random = RandomizedSearchCV( estimator = lr,
-        #                           param_distributions = random_grid,
-        #                           n_iter=40,
-        #                           cv = 5,
-        #                           verbose=2,
-        #                           n_jobs = -1)
-        print("\tEstimating a logistic regression...")
-        lr.fit(X_train, y_train)
-        print("\tDone!")
-        # accuracy prediciton
-        pred_train = lr.predict(X_train)
-        pred_test = lr.predict(X_test)
-        pred_probs = lr.predict_proba(X_test) # probabilities
-        # dict for output
-        output = { "pred_prob": pred_probs[:,1],
-                   "pred_test": pred_test,
-                   "pred_train": pred_train,
-                   "lr_model": lr
-                 }
+        # random_grid = set_params_grid_search()
+        lr = LogisticRegression( penalty="none",
+                                 fit_intercept=True,
+                                 intercept_scaling=1,
+                                 class_weight=None,
+                                 solver = "saga", # optimiztion algorithm
+                                 max_iter = 500
+                              )
+        #
+        print('.'*60)
+        print("\tEstimating a logistic regression..\n")
+        output = lr.fit(X_train, y_train)
+        print("\n\tDone!\n\n")
+        print('.'*60)
         return output
 
 
-def ROC_curve_values(rf_output, y_test, model):
-    fpr, tpr, _ = roc_curve(y_test, rf_output[model]["pred_prob"])
-    auc_value = auc(fpr, tpr)
-    return [fpr, tpr, auc_value]
+def unpack_gridSearch(output_list):
+    best_models = []
+    for model in output_list:
+        best_models.append(model.best_estimator_)
+    return best_models
+
+
+def ROC_curve_values(best_models, y_test):
+    roc_models = []
+    for model in best_models:
+        # accuracy prediciton
+        pred_train = model.predict(X_train)
+        pred_test = model.predict(X_test)
+        pred_probs = model.predict_proba(X_test) # probabilities
+        # ROC curve
+        fpr, tpr, _ = roc_curve(y_test, pred_probs[:,1])
+        auc_value = auc(fpr, tpr)
+        roc_models.append([fpr, tpr, auc_value])
+    return roc_models
+
+
+def rf_outputs(rf):
+    # accuracy prediciton
+    pred_train = rf.predict(X_train)
+    pred_test = rf.predict(X_test)
+    pred_probs = rf.predict_proba(X_test) # probabilities
+    # dict for output
+    output = { "pred_prob": pred_probs[:,1],
+               "pred_test": pred_test,
+               "pred_train": pred_train,
+               "rf_model": rf
+             }
+
+    return output
+
 
 
 def get_y_test():
