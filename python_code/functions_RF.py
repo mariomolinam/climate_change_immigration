@@ -307,6 +307,71 @@ def logistic_regression_stat(X_train, y_train):
         return output
 
 
+def run_RF(file_names):
+    no_models = 10  # includes: LogisticRegression and RF with sociodemographics only (+2)
+                    #           RF with 9 different climate change variables (+9)
+
+    # STORE VALUES HERE
+    MODEL_OUTPUT = {}
+
+    for i in range(no_models):
+        # define names (to be used when STORING values)
+        features_set = "set_" + str(i)
+        for f in range(len(file_names)):
+            # LOAD DATA
+            mmp_data_weather = pd.read_csv(file_names[f])
+            #####################################################################
+            #  S E L E C T   F E A T U R E S
+            #####################################################################
+            first_migration = ["migf"]
+            all_features = get_features(file_names[f])
+            # time-constant varaibles
+            features_time_constant = all_features['time_constant']
+            # time-varying variables
+            features_time_varying = all_features['time_varying']
+            # weather measures
+            features_weather = all_features['weather_vars']
+            # get weather names
+            weather_names = ['sociodemographics only'] + sorted( features_weather.keys() )
+            weather_var = weather_names[i]
+            print("\nVariable number: " + str(i))
+            # set features for models
+            features = features_time_constant + features_time_varying
+            # add weather_variables when needed
+            if i !=0:
+                features = features + features_weather[weather_names[i]]
+            # remove missing values
+            tr = mmp_data_weather.loc[:, first_migration + features]
+            tr_subset = tr.dropna(axis=0, how="any")
+            #####################################################################
+            # B U I L D   M O D E L S
+            #####################################################################
+            # CREATE VARIABLES
+            ###################################
+            # target vector
+            y = np.array(tr_subset.migf)
+            # features
+            X = np.array(tr_subset.loc[:,features ])
+            # train and test sets
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=200)
+            #  R A N D O M   F O R E S T
+            ###################################
+            # run Grid Search of Random Forest
+            rf_output = multiple_RF(X_train, y_train)
+            # L O G I S T I C   R E G R E S S I O N
+            ###################################
+            lr_output = logistic_regression_stat(X_train, y_train)
+            # S T O R E   O U T P U T
+            MODEL_OUTPUT[weather_names[i]] = {data_structure[f]: {"rf": rf_output, "lr": lr_output}}
+
+
+
+
+
+
+
+
+
 def unpack_gridSearch(output_list):
     best_models = []
     for model in output_list:

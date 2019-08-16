@@ -3,88 +3,39 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 import sys, os
-sys.path.insert(0, "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration/python_code")
-# sys.path.insert(0, "/home/mm2535/documents/climate_change_immigration/python_code")
+# sys.path.insert(0, "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration/python_code")
+sys.path.insert(0, "/home/mm2535/documents/climate_change_immigration/python_code")
 import functions_RF as func_rf
 import plots_RF as plots
 
 
 # paths
-path_data = "/home/mario/Documents/environment_data/mmp_data"
-path_git = "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration"
-# path_data = "/home/mm2535/documents/data/climate_change"
-# path_git = "/home/mm2535/documents/climate_change_immigration"
+# path_data = "/home/mario/Documents/environment_data/mmp_data"
+# path_git = "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration"
+path_data = "/home/mm2535/documents/data/climate_change"
+path_git = "/home/mm2535/documents/climate_change_immigration"
 
 
 
+# DEFINE FILE NAMES
 file_names = [ path_data + "/" + x for x in os.listdir(path_data) if "train" in x]
 f = file_names[0]
+# TYPES OF DATA STRUCTURE
 data_structure = ["long_aug", "wide", "long_noaug"]
 
-no_models = 11  # includes: LogisticRegression and RF with sociodemographics only (+2)
-                #           RF with 9 different climate change variables (+9)
+# RUN RANDOM FORESTS (this wil take a while...)
+#           It run 10 models for 3 different data structures using a Randomized grid search with Cross-validation.
+#           It also includes different weight schemes for each model.
+models_output = func_rf.run_RF(file_names)
 
-# STORE VALUES HERE
-MODEL_OUTPUT = {}
 
-np_array_fpr = {}
-
-rf_output_dict = {}
-lr_output_dict = {}
-
-y_test_list  = []
-y_train_list = []
-
-for i in range(no_models):
-    # define names (to be used when STORING values)
-    features_set = "set_" + str(i)
-    for f in range(len(file_names)):
-        # LOAD DATA
-        mmp_data_weather = pd.read_csv(file_names[f])
-        #####################################################################
-        #  S E L E C T   F E A T U R E S
-        #####################################################################
-        first_migration = ["migf"]
-        all_features = func_rf.get_features(file_names[f])
-        # time-constant varaibles
-        features_time_constant = all_features['time_constant']
-        # time-varying variables
-        features_time_varying = all_features['time_varying']
-        # weather measures
-        features_weather = all_features['weather_vars']
-        # get weather names
-        weather_names = ['sociodemographics only'] + sorted( features_weather.keys() )
-        weather_var = weather_names[i]
-        print("\nVariable number: " + str(i))
-        # set features for models
-        features = features_time_constant + features_time_varying
-        # add weather_variables when needed
-        if i !=0:
-            features = features + features_weather[weather_names[i]]
-        # remove missing values
-        tr = mmp_data_weather.loc[:, first_migration + features]
-        tr_subset = tr.dropna(axis=0, how="any")
-        #####################################################################
-        # B U I L D   M O D E L S
-        #####################################################################
-        # CREATE VARIABLES
-        ###################################
-        # target vector
-        y = np.array(tr_subset.migf)
-        # features
-        X = np.array(tr_subset.loc[:,features ])
-        # train and test sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=200)
-        #  R A N D O M   F O R E S T
-        ###################################
-        # run Grid Search of Random Forest
-        rf_output = func_rf.multiple_RF(X_train, y_train)
-        # L O G I S T I C   R E G R E S S I O N
-        ###################################
-        lr_output = func_rf.logistic_regression_stat(X_train, y_train)
-        # S T O R E   O U T P U T
-        MODEL_OUTPUT[weather_names[i]] = {data_structure[f]: {"rf": rf_output, "lr": lr_output}}
-
+# np_array_fpr = {}
+#
+# rf_output_dict = {}
+# lr_output_dict = {}
+#
+# y_test_list  = []
+# y_train_list = []
 
 
 
