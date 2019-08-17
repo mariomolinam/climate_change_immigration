@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import sys, os
-# sys.path.insert(0, "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration/python_code")
-sys.path.insert(0, "/home/mm2535/documents/climate_change_immigration/python_code")
+# sys.path.insert(0, "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration/python_code") # local
+sys.path.insert(0, "/home/mm2535/documents/climate_change_immigration/python_code") # sdl1
+# sys.path.insert(0, "/home/mm2535/documents/climate_change_immigration/python_code") # sdl3
 import functions_RF as func_rf
 import plots_RF as plots
 
@@ -11,7 +12,9 @@ import plots_RF as plots
 # paths
 # path_data = "/home/mario/Documents/environment_data/mmp_data"
 # path_git = "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration"
-path_data = "/home/mm2535/documents/data/climate_change"
+# path_data = "/home/mm2535/documents/data/climate_change"        # sdl1
+path_data = "/home/mm2535/data/climate_change"                  # sdl3
+
 path_git = "/home/mm2535/documents/climate_change_immigration"
 
 
