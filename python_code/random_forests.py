@@ -38,10 +38,6 @@ models_output = func_rf.run_RF(file_names)
 
 
 
-
-
-
-
         # O U T P U T S
         ###################################
 
