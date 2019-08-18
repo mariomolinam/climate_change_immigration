@@ -228,7 +228,7 @@ def random_forest_stat(X_train, y_train, weight):
                                   param_distributions = random_grid,
                                   scoring = "balanced_accuracy", # accounts for imbalance in data
                                   n_jobs = -1, # use all cores; but use only 10 in sdl1
-                                  n_iter = 20,
+                                  n_iter = 25,
                                   cv = 3,
                                   refit = True,
                                   verbose=2,
@@ -266,9 +266,9 @@ def multiple_RF(X_train, y_train):
     # define class weights
     weights = [ "balanced_subsample",               # ratio:  49/1 (approx)
                 {0:0.01, 1: 1000}                   # ratio:  100000/1
-                # {0:0.01, 1: 1000000},               # ratio:  100000000/1
-                # # # {0:0.01, 1: 10000000},              # ratio:  1000000000/1
-                # {0:0.01, 1: 100000000}              # ratio:  10000000000/1
+                {0:0.01, 1: 1000000},               # ratio:  100000000/1
+                # {0:0.01, 1: 10000000},              # ratio:  1000000000/1
+                {0:0.01, 1: 100000000}              # ratio:  10000000000/1
                 ]
     # loop through all weights
     save_outputs = list()
@@ -308,7 +308,7 @@ def logistic_regression_stat(X_train, y_train):
         return output
 
 
-def run_RF(file_names):
+def run_RF(file_names, data_structure):
     no_models = 10  # includes: LogisticRegression and RF with sociodemographics only (+2)
                     #           RF with 9 different climate change variables (+9)
 

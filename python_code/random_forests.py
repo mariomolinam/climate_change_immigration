@@ -13,7 +13,7 @@ import plots_RF as plots
 # path_data = "/home/mario/Documents/environment_data/mmp_data"
 # path_git = "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration"
 # path_data = "/home/mm2535/documents/data/climate_change"        # sdl1
-path_data = "/home/mm2535/data/climate_change"                  # sdl3
+path_data = "/home/mm2535/data/climate_change"                    # sdl3
 
 path_git = "/home/mm2535/documents/climate_change_immigration"
 
@@ -28,7 +28,7 @@ data_structure = ["long_aug", "wide", "long_noaug"]
 # RUN RANDOM FORESTS (this wil take a while...)
 #           It run 10 models for 3 different data structures using a Randomized grid search with Cross-validation.
 #           It also includes different weight schemes for each model.
-models_output = func_rf.run_RF(file_names)
+models_output = func_rf.run_RF(file_names, data_structure)
 
 
 # np_array_fpr = {}
