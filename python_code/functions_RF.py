@@ -310,7 +310,7 @@ def logistic_regression_stat(X_train, y_train):
 
 def run_RF(file_names, data_structure):
     no_models = 10  # includes: LogisticRegression and RF with sociodemographics only (+2)
-                #           RF with 9 different climate change variables (+9)
+            #           RF with 9 different climate change variables (+9)
     # STORE VALUES HERE
     MODEL_OUTPUT = {}
 
@@ -321,11 +321,12 @@ def run_RF(file_names, data_structure):
         for f in range(len(file_names)):
             # LOAD DATA
             mmp_data_weather = pd.read_csv(file_names[f])
+
             #####################################################################
             #  S E L E C T   F E A T U R E S
             #####################################################################
             first_migration = ["migf"]
-            all_features = get_features(file_names[f])
+            all_features = func_rf.get_features(file_names[f])
             # time-constant varaibles
             features_time_constant = all_features['time_constant']
             # time-varying variables
@@ -340,7 +341,7 @@ def run_RF(file_names, data_structure):
             features = features_time_constant + features_time_varying
             # add weather_variables when needed
             if i !=0:
-                features = features + [features_weather[weather_names[i]]]
+                features = features + features_weather[weather_names[i]]
             # remove missing values
             tr = mmp_data_weather.loc[:, first_migration + features]
             tr_subset = tr.dropna(axis=0, how="any")
