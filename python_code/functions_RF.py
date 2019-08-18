@@ -326,7 +326,7 @@ def run_RF(file_names, data_structure):
             #  S E L E C T   F E A T U R E S
             #####################################################################
             first_migration = ["migf"]
-            all_features = func_rf.get_features(file_names[f])
+            all_features = get_features(file_names[f])
             # time-constant varaibles
             features_time_constant = all_features['time_constant']
             # time-varying variables

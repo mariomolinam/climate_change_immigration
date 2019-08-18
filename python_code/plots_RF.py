@@ -13,8 +13,8 @@ from sklearn.metrics import roc_auc_score
 from sklearn.metrics import average_precision_score
 import matplotlib.pyplot as plt
 import sys
-sys.path.insert(0, "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration/python_code")
-import functions_RF as func_rf
+# sys.path.insert(0, "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration/python_code")
+# import functions_RF as func_rf
 
 
 # paths
