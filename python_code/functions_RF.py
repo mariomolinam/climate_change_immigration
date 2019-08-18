@@ -265,8 +265,8 @@ def multiple_RF(X_train, y_train):
     """
     # define class weights
     weights = [ "balanced_subsample",               # ratio:  49/1 (approx)
-                {0:0.01, 1: 1000}                   # ratio:  100000/1
-                {0:0.01, 1: 1000000},               # ratio:  100000000/1
+                {0:0.01, 1: 1000},                   # ratio:  100000/1
+                # {0:0.01, 1: 1000000},               # ratio:  100000000/1
                 # {0:0.01, 1: 10000000},              # ratio:  1000000000/1
                 {0:0.01, 1: 100000000}              # ratio:  10000000000/1
                 ]
