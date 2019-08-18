@@ -326,7 +326,7 @@ def run_RF(file_names, data_structure):
             #  S E L E C T   F E A T U R E S
             #####################################################################
             first_migration = ["migf"]
-            all_features = func_rf.get_features(file_names[f])
+            all_features = get_features(file_names[f])
             # time-constant varaibles
             features_time_constant = all_features['time_constant']
             # time-varying variables
@@ -367,12 +367,12 @@ def run_RF(file_names, data_structure):
             # features
             X = np.array(tr_subset.loc[:,features ])
             # train and test sets
-            X_train, X_test, y_train, y_test = func_rf.train_test_split(X, y, test_size=0.25, random_state=200)
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=200)
 
             #  R A N D O M   F O R E S T
             ###################################
             # run Grid Search of Random Forest
-            rf_output = func_rf.multiple_RF(X_train, y_train)
+            rf_output = multiple_RF(X_train, y_train)
 
             # L O G I S T I C   R E G R E S S I O N
             ###################################
