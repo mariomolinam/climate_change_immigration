@@ -3,29 +3,25 @@ import pandas as pd
 import numpy as np
 import sys, os, socket
 
-
 # DEFINE PATHS depending on hostname server
 hostname = socket.gethostname()
 if hostname == 'molina':
     path_data = "/home/mario/Documents/environment_data/mmp_data"
     path_git = "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration"
-    sys.path.insert(0, "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration/python_code") # local
-    import functions_RF as func_rf
-    import plots_RF as plots
+elif hostname == 'sdl1':
+    path_git = "/home/mm2535/documents/climate_change_immigration"
+    path_data = "/home/mm2535/documents/data/climate_change"
 elif hostname == 'sdl3':
     path_git = "/home/mm2535/documents/climate_change_immigration"
     path_data = "/home/mm2535/data/climate_change"
-    sys.path.insert(0, "/home/mm2535/documents/climate_change_immigration/python_code") # sdl3
-    import functions_RF as func_rf
-    import plots_RF as plots
-elif hostname == 'sdl1':
-    path_git = "/home/mm2535/documents/climate_change_immigration"
-    path_data = "/home/mm2535/documents/data/climate_change"        # sdl1
-    sys.path.insert(0, "/home/mm2535/documents/climate_change_immigration/python_code") # sdl1
-    import functions_RF as func_rf
-    import plots_RF as plots
+
+# ADD PATH AND LOAD CUSTOMIZED FUNCTIONS
+sys.path.insert(0, path_git)
+import python_code.functions_RF as func_rf
+import python_code.plots_RF as plots
 
 
+############################################################################################
 
 # DEFINE FILE NAMES
 file_names = [ path_data + "/" + x for x in os.listdir(path_data) if "train" in x]
