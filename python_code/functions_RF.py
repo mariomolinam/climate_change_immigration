@@ -87,7 +87,7 @@ def get_features(file):
                               "weather_vars": weather_vars }
     elif "long_noaug" in file:
         # rename weather variables
-        weather_vars = { weather_keys[x]: [ weather_vars[x] + 'lag_t' + str(i) for i in range(5) ] for x in range(len(weather_vars)) }
+        weather_vars = { weather_keys[x]: [ weather_vars[x] + '_lag_t' + str(i) for i in range(5) ] for x in range(len(weather_vars)) }
 
         features_sociodem = { "time_constant": features_sociodem_constant,
                               "time_varying": features_sociodem_varying,
