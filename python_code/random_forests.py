@@ -1,21 +1,25 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import sys, os
-# sys.path.insert(0, "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration/python_code") # local
-sys.path.insert(0, "/home/mm2535/documents/climate_change_immigration/python_code") # sdl1
-# sys.path.insert(0, "/home/mm2535/documents/climate_change_immigration/python_code") # sdl3
+import sys, os, socket
 import functions_RF as func_rf
 import plots_RF as plots
 
 
-# paths
-# path_data = "/home/mario/Documents/environment_data/mmp_data"
-# path_git = "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration"
-# path_data = "/home/mm2535/documents/data/climate_change"        # sdl1
-path_data = "/home/mm2535/data/climate_change"                    # sdl3
-path_git = "/home/mm2535/documents/climate_change_immigration"
-
+# DEFINE PATHS depending on hostname server
+hostname = socket.gethostname()
+if hostname == 'molina':
+    path_data = "/home/mario/Documents/environment_data/mmp_data"
+    path_git = "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration"
+    sys.path.insert(0, "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration/python_code") # local
+elif hostname == 'sdl3':
+    path_git = "/home/mm2535/documents/climate_change_immigration"
+    path_data = "/home/mm2535/data/climate_change"
+    sys.path.insert(0, "/home/mm2535/documents/climate_change_immigration/python_code") # sdl3
+elif hostname == 'sdl1':
+    path_git = "/home/mm2535/documents/climate_change_immigration"
+    path_data = "/home/mm2535/documents/data/climate_change"        # sdl1
+    sys.path.insert(0, "/home/mm2535/documents/climate_change_immigration/python_code") # sdl1
 
 
 # DEFINE FILE NAMES
@@ -23,6 +27,7 @@ file_names = [ path_data + "/" + x for x in os.listdir(path_data) if "train" in 
 f = file_names[0]
 # TYPES OF DATA STRUCTURE
 data_structure = ["long_aug", "wide", "long_noaug"]
+
 
 # RUN RANDOM FORESTS (this wil take a while...)
 #           It run 10 models for 3 different data structures using a Randomized grid search with Cross-validation.
