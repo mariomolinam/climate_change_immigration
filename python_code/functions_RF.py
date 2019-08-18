@@ -229,7 +229,7 @@ def random_forest_stat(X_train, y_train, weight):
                                   scoring = "balanced_accuracy", # accounts for imbalance in data
                                   n_jobs = -1, # use all cores; but use only 10 in sdl1
                                   n_iter = 1,
-                                  cv = 1,
+                                  cv = 2,
                                   refit = True,
                                   verbose=2,
                                   random_state=466

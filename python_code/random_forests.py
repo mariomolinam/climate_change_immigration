@@ -12,8 +12,8 @@ import plots_RF as plots
 # paths
 # path_data = "/home/mario/Documents/environment_data/mmp_data"
 # path_git = "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration"
-path_data = "/home/mm2535/documents/data/climate_change"        # sdl1
-# path_data = "/home/mm2535/data/climate_change"                    # sdl3
+# path_data = "/home/mm2535/documents/data/climate_change"        # sdl1
+path_data = "/home/mm2535/data/climate_change"                    # sdl3
 path_git = "/home/mm2535/documents/climate_change_immigration"
 
 
