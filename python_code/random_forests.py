@@ -24,10 +24,9 @@ import python_code.plots_RF as plots
 ############################################################################################
 
 # DEFINE FILE NAMES
-file_names = [ path_data + "/" + x for x in os.listdir(path_data) if "train" in x]
-f = file_names[0]
+file_names = sorted([ path_data + "/" + x for x in os.listdir(path_data) if "train" in x])
 # TYPES OF DATA STRUCTURE
-data_structure = ["long_aug", "wide", "long_noaug"]
+data_structure = sorted(["long_aug", "wide", "long_noaug"])
 
 
 # RUN RANDOM FORESTS (this wil take a while...)
