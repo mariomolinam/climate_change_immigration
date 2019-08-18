@@ -94,7 +94,7 @@ def get_features(file):
                               "weather_vars": weather_vars }
     else:
         # rename weather variables
-        weather_vars = { weather_keys[x]: [ weather_vars[x] + '_t' + str(i) for i in range(5) ] for x in range(len(weather_vars)) }
+        weather_vars = { weather_keys[x]: [ weather_vars[x] + '_' + str(i) for i in range(5) ] for x in range(len(weather_vars)) }
 
         # rename time_varying variables
         features_sociodem_varying = [ name + "_" + str(i) for i in range(5) for name in features_sociodem_varying ]
