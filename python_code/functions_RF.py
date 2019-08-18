@@ -339,9 +339,9 @@ def run_RF(file_names, data_structure):
             # set features for models
             features = features_time_constant + features_time_varying
             # add weather_variables when needed
-            if i !=0:
+            if i != 0:
                 if len(features_weather[weather_names[i]]) == 1:
-                    weather_vars = [features_weather[weather_names[i]]
+                    weather_vars = [features_weather[weather_names[i]]]
                 else:
                     weather_vars = features_weather[weather_names[i]]
                 # create features list
