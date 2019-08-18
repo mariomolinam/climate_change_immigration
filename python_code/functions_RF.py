@@ -87,7 +87,7 @@ def get_features(file):
                               "weather_vars": weather_vars }
     elif "long_noaug" in file:
         # rename weather variables
-        weather_vars = { weather_keys[x]: [ weather_vars[x] + '_t' + str(i) for i in range(5) ] for x in range(len(weather_vars)) }
+        weather_vars = { weather_keys[x]: [ weather_vars[x] + 'lag_t' + str(i) for i in range(5) ] for x in range(len(weather_vars)) }
 
         features_sociodem = { "time_constant": features_sociodem_constant,
                               "time_varying": features_sociodem_varying,
@@ -320,51 +320,54 @@ def run_RF(file_names, data_structure):
 
         for f in range(len(file_names)):
             # LOAD DATA
-            mmp_data_weather = pd.read_csv(file_names[f])
+mmp_data_weather = pd.read_csv(file_names[f])
 
-            #####################################################################
-            #  S E L E C T   F E A T U R E S
-            #####################################################################
-            first_migration = ["migf"]
-            all_features = func_rf.get_features(file_names[f])
-            # time-constant varaibles
-            features_time_constant = all_features['time_constant']
-            # time-varying variables
-            features_time_varying = all_features['time_varying']
-            # weather measures
-            features_weather = all_features['weather_vars']
-            # get weather names
-            weather_names = ['sociodemographics only'] + sorted( features_weather.keys() )
-            # weather_var = weather_names[i]
-            # set features for models
-            features = features_time_constant + features_time_varying
-            # add weather_variables when needed
-            if i != 0:
-                if len(features_weather[weather_names[i]]) == 1:
-                    weather_vars = [features_weather[weather_names[i]]]
-                else:
-                    weather_vars = features_weather[weather_names[i]]
-                # create features list
-                features = features + features_weather[weather_names[i]]
-            # remove missing values
-            tr = mmp_data_weather.loc[:, first_migration + features]
-            tr_subset = tr.dropna(axis=0, how="any")
+#####################################################################
+#  S E L E C T   F E A T U R E S
+#####################################################################
+first_migration = ["migf"]
+all_features = func_rf.get_features(file_names[f])
+# time-constant varaibles
+features_time_constant = all_features['time_constant']
+# time-varying variables
+features_time_varying = all_features['time_varying']
+# weather measures
+features_weather = all_features['weather_vars']
+# get weather names
+weather_names = ['sociodemographics only'] + sorted( features_weather.keys() )
+# weather_var = weather_names[i]
+# set features for models
+features = features_time_constant + features_time_varying
 
-            print("\nVariable number: " + str(weather_names[i]))
-            print("\tFile: " + file_names[f] )
-            print("\tData subset shape:" + str(tr_subset.shape) + "\n")
-            #####################################################################
-            # B U I L D   M O D E L S
-            #####################################################################
+# add weather_variables when needed
+if i > 0:
+    if not isinstance(features_weather[weather_names[i]], list):
+        weather_vars = [ features_weather[weather_names[i]] ]
+    else:
+        weather_vars = features_weather[weather_names[i]]
+    # create features list
+    features = features + weather_vars
 
-            # C R E A T E   V A R I A B L E S
-            ###################################
-            # target vector
-            y = np.array(tr_subset.migf)
-            # features
-            X = np.array(tr_subset.loc[:,features ])
-            # train and test sets
-            X_train, X_test, y_train, y_test = func_rf.train_test_split(X, y, test_size=0.25, random_state=200)
+
+# remove missing values
+tr = mmp_data_weather.loc[:, first_migration + features]
+tr_subset = tr.dropna(axis=0, how="any")
+
+print("\nVariable number: " + str(weather_names[i]))
+print("\tFile: " + file_names[f] )
+print("\tData subset shape:" + str(tr_subset.shape) + "\n")
+#####################################################################
+# B U I L D   M O D E L S
+#####################################################################
+
+# C R E A T E   V A R I A B L E S
+###################################
+# target vector
+y = np.array(tr_subset.migf)
+# features
+X = np.array(tr_subset.loc[:,features ])
+# train and test sets
+X_train, X_test, y_train, y_test = func_rf.train_test_split(X, y, test_size=0.25, random_state=200)
 
             #  R A N D O M   F O R E S T
             ###################################
