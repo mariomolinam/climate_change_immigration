@@ -309,7 +309,7 @@ def logistic_regression_stat(X_train, y_train):
 
 
 def run_RF(file_names, data_structure):
-    no_models = 10  # includes: LogisticRegression and RF with sociodemographics only (+2)
+    no_models = 1  # includes: LogisticRegression and RF with sociodemographics only (+2)
             #           RF with 9 different climate change variables (+9)
     # STORE VALUES HERE
     MODEL_OUTPUT = {}
@@ -317,6 +317,8 @@ def run_RF(file_names, data_structure):
     for i in range(no_models):
         # define names (to be used when STORING values)
         features_set = "set_" + str(i)
+        # add dict to MODEL_OUTPUT
+        MODEL_OUTPUT[i] = {}
 
         for f in range(len(file_names)):
             # LOAD DATA
@@ -379,7 +381,7 @@ def run_RF(file_names, data_structure):
             lr_output = logistic_regression_stat(X_train, y_train)
 
             # S T O R E   O U T P U T
-            MODEL_OUTPUT[weather_names[i]] = {data_structure[f]: {"rf": rf_output, "lr": lr_output}}
+            MODEL_OUTPUT[i].update( {data_structure[f]: {"rf": rf_output, "lr": lr_output} } )
 
     return MODEL_OUTPUT
 
