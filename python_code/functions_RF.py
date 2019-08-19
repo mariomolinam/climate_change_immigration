@@ -177,11 +177,11 @@ def weather_features():
 
 def set_params_grid_search():
     # Number of trees in random forest
-    n_estimators = [int(x) for x in np.linspace(start = 500, stop = 1500, num = 1)]
+    n_estimators = [int(x) for x in np.linspace(start = 500, stop = 1500, num = 21)]
     # Number of features to consider at every split
     # max_features = ['auto', 'sqrt']
     # Maximum number of levels in tree
-    max_depth = [int(x) for x in np.linspace(5, 40, num = 1)]
+    max_depth = [int(x) for x in np.linspace(5, 40, num = 8)]
     max_depth.append(None)
     # Minimum number of samples required to split a node
     # min_samples_split = [2, 5, 10]
@@ -227,9 +227,9 @@ def random_forest_stat(X_train, y_train, weight):
     rf_grid = RandomizedSearchCV( estimator = rf,
                                   param_distributions = random_grid,
                                   scoring = "balanced_accuracy", # accounts for imbalance in data
-                                  n_jobs = 8, # number of cores (-1 to use them all)
-                                  n_iter = 1,
-                                  cv = 2,
+                                  n_jobs = 10, # number of cores (-1 to use them all)
+                                  n_iter = 20,
+                                  cv = 3,
                                   refit = True,
                                   verbose = 2
                                   # random_state=466
@@ -266,7 +266,7 @@ def multiple_RF(X_train, y_train):
     # define class weights
     weights = [ "balanced_subsample",               # ratio:  49/1 (approx)
                 # {0:0.01, 1: 1000},                   # ratio:  100000/1
-                # {0:0.01, 1: 1000000},               # ratio:  100000000/1
+                {0:0.01, 1: 1000000}               # ratio:  100000000/1
                 # {0:0.01, 1: 10000000},              # ratio:  1000000000/1
                 # {0:0.01, 1: 100000000}              # ratio:  10000000000/1
                 ]
