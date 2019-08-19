@@ -177,11 +177,11 @@ def weather_features():
 
 def set_params_grid_search():
     # Number of trees in random forest
-    n_estimators = [int(x) for x in np.linspace(start = 500, stop = 1500, num = 1)]
+    n_estimators = [int(x) for x in np.linspace(start = 500, stop = 1500, num = 21)]
     # Number of features to consider at every split
     # max_features = ['auto', 'sqrt']
     # Maximum number of levels in tree
-    max_depth = [int(x) for x in np.linspace(5, 40, num = 1)]
+    max_depth = [int(x) for x in np.linspace(5, 40, num = 8)]
     max_depth.append(None)
     # Minimum number of samples required to split a node
     # min_samples_split = [2, 5, 10]
@@ -228,11 +228,11 @@ def random_forest_stat(X_train, y_train, weight):
                                   param_distributions = random_grid,
                                   scoring = "balanced_accuracy", # accounts for imbalance in data
                                   n_jobs = -1, # use all cores; but use only 10 in sdl1
-                                  n_iter = 1,
-                                  cv = 2,
+                                  n_iter = 20,
+                                  cv = 3,
                                   refit = True,
-                                  verbose=2,
-                                  random_state=466
+                                  verbose = 2
+                                  # random_state=466
                                   )
     # rf_grid = GridSearchCV( estimator = rf,
     #                        param_grid = random_grid,
@@ -266,7 +266,7 @@ def multiple_RF(X_train, y_train):
     # define class weights
     weights = [ "balanced_subsample",               # ratio:  49/1 (approx)
                 # {0:0.01, 1: 1000},                   # ratio:  100000/1
-                # {0:0.01, 1: 1000000},               # ratio:  100000000/1
+                {0:0.01, 1: 1000000},               # ratio:  100000000/1
                 # {0:0.01, 1: 10000000},              # ratio:  1000000000/1
                 # {0:0.01, 1: 100000000}              # ratio:  10000000000/1
                 ]
@@ -292,10 +292,10 @@ def logistic_regression_stat(X_train, y_train):
         Return: dictionary
         """
         # random_grid = set_params_grid_search()
-        lr = LogisticRegression( penalty="none",
-                                 fit_intercept=True,
-                                 intercept_scaling=1,
-                                 class_weight=None,
+        lr = LogisticRegression( penalty = "none",
+                                 fit_intercept = True,
+                                 intercept_scaling = 1,
+                                 class_weight = None,
                                  solver = "saga", # optimization algorithm
                                  max_iter = 500
                               )
@@ -376,7 +376,7 @@ def run_RF(file_names, data_structure):
 
             # L O G I S T I C   R E G R E S S I O N
             ###################################
-            lr_output = None # logistic_regression_stat(X_train, y_train)
+            lr_output = logistic_regression_stat(X_train, y_train)
 
             # S T O R E   O U T P U T
             MODEL_OUTPUT[weather_names[i]] = {data_structure[f]: {"rf": rf_output, "lr": lr_output}}
