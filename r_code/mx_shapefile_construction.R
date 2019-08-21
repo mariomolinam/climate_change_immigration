@@ -1,28 +1,7 @@
-# # libraries
-# local.lib = '/home/mm2535/R/x86_64-pc-linux-gnu-library'  # path to library on SDL1 server
-# 
-# library(readxl, lib=local.lib)
-# library(sp, lib=local.lib)
-# library(raster, lib=local.lib)
-# library(parallel, lib=local.lib)
-# library(sf, lib=local.lib)
-# library(velox, lib=local.lib)
-# library(rgdal, lib=local.lib)
-# library(maps, lib=local.lib)
-# library(mapdata, lib=local.lib)
-# library(crayon, lib=local.lib)
-# library(withr, lib=local.lib)
-# library(ggplot2, lib=local.lib)
-# library(rgeos, lib=local.lib)
-# 
-#   
-##################### SHAPEFILE MEXICO
-#setwd('/home/mario/Documents/environment_data/mexican_shapefiles/')
-#tmp = '/home/mario/Documents/environment_data/mexican_shapefiles/tmp_folder'
 
-# paths in SDL1 server
-setwd('/home/mm2535/documents/data/immigration_data')
-tmp = '/home/mm2535/documents/data/immigration_data/tmp_folder'
+##################### SHAPEFILE MEXICO
+setwd(path.shapefiles)
+
 
 all.files = list.files(pattern='.zip') # only zip files
 if(! 'mx_sh' %in% list.files()) dir.create('mx_sh') # create directory to store MX shapefiles
@@ -55,6 +34,7 @@ for(i in 1:length(all.files)){
   for(l in 1:length(pattern)){
     # read shapefile
     f.read = readOGR(dsn = build_path, layer = pattern[l])
+    f.read = readOGR(dsn = build_path, layer = "01mun")
     # it fixs problem with invalid multibyte string
     f.read@data[,'NOMBRE'] = iconv(f.read$NOMBRE)
     if(l==1) {
@@ -85,7 +65,6 @@ for(i in 1:length(all.files)){
     # visual delimiter
     cat('\n', '########################################################', '\n')
 }
-
 
 # bind all layers together
 mx.layers = list.files('mx_sh/')

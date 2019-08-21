@@ -33,6 +33,7 @@ handle.geocode = function(x){
   if(sum(is.na(x[rows])) == 0) paste0( x[rows][1], x[rows][2], x[rows][3] )
   else x["CVEGEO"]
 }
+
 cat('\n', 'Creating geocode...', '\n')
 mx.loc@data[,'geocode'] = apply(mx.loc@data, 1, function(x) handle.geocode(x)) 
 cat('Done!', '\n')

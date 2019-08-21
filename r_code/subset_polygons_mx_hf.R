@@ -12,7 +12,7 @@ raster_layers = stack(unlist(raster))
 ################################################################
 # shapefiles for Mexican STATES (not localities)
 setwd(path.shapefiles)
-tmp = '/home/mario/Documents/environment_data/mexican_shapefiles/tmp_folder'
+
 # create directory if it doesn't exist
 if( ! file.exists('state_level_footprints') ) dir.create('state_level_footprints')
 # all zip files
