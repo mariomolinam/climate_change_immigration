@@ -221,7 +221,7 @@ def random_forest_stat(X_train, y_train, weight):
     rf_grid = RandomizedSearchCV( estimator = rf,
                                   param_distributions = random_grid,
                                   scoring = "balanced_accuracy", # accounts for imbalance in data
-                                  n_jobs = 10, # number of cores (-1 to use them all)
+                                  n_jobs = -1, # number of cores (-1 to use them all)
                                   n_iter = 20,
                                   cv = 3,
                                   refit = True,
