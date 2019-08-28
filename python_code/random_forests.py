@@ -34,46 +34,20 @@ data_structure = sorted(["long_aug", "wide", "long_noaug"])
 #           It also includes different weight schemes for each model.
 models_output = func_rf.run_RF(file_names, data_structure)
 
+validation_vars = run_RF(file_names, data_structure)
+
+# Extract best models from RF grid search
+rf_best = unpack_gridSearch(file_names = models_output, data_structure = "wide")
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# np_array_fpr = {}
-#
-# rf_output_dict = {}
-# lr_output_dict = {}
-#
-# y_test_list  = []
-# y_train_list = []
 
 
 
         # O U T P U T S
         ###################################
 
-        # Extract best models
-        rf_best = unpack_gridSearch(rf_output)
         lr_best = lr_output
 
         # ROC values

@@ -69,7 +69,6 @@ def get_features(file):
          'norm_deviation_short-term_prcp',
          'warm_spell_tmax',
     ]
-
     weather_keys = [ 'crude_raw_prcp',
                      'crude_raw_tmax',
                      'crude_above30_tmax',
@@ -79,7 +78,6 @@ def get_features(file):
                      'norm_dev_short_tmax',
                      'norm_dev_short_prcp',
                      'warm_spell']
-
     if "long_aug" in file:
         weather_vars = { weather_keys[x]: weather_vars[x] for x in range(len(weather_vars)) }
         features_sociodem = { "time_constant": features_sociodem_constant,
@@ -88,21 +86,17 @@ def get_features(file):
     elif "long_noaug" in file:
         # rename weather variables
         weather_vars = { weather_keys[x]: [ weather_vars[x] + '_lag_t' + str(i) for i in range(5) ] for x in range(len(weather_vars)) }
-
         features_sociodem = { "time_constant": features_sociodem_constant,
                               "time_varying": features_sociodem_varying,
                               "weather_vars": weather_vars }
     else:
         # rename weather variables
         weather_vars = { weather_keys[x]: [ weather_vars[x] + '_' + str(i) for i in range(5) ] for x in range(len(weather_vars)) }
-
         # rename time_varying variables
         features_sociodem_varying = [ name + "_" + str(i) for i in range(5) for name in features_sociodem_varying ]
-
         features_sociodem = { "time_constant": features_sociodem_constant,
                               "time_varying": features_sociodem_varying,
                               "weather_vars": weather_vars }
-
     return features_sociodem
 
 
@@ -309,92 +303,98 @@ def logistic_regression_stat(X_train, y_train):
 
 
 def run_RF(file_names, data_structure):
+    # number of models
     no_models = 10  # includes: LogisticRegression and RF with sociodemographics only (+2)
             #           RF with 9 different climate change variables (+9)
+
+    # define type of file
+    for file in file_names:
+        if data_structure in file:
+            f = file
+            break
+
+    # LOAD DATA
+    mmp_data_weather = pd.read_csv(f)
+
+    #####################################################################
+    #  S E L E C T   F E A T U R E S
+    #####################################################################
+    first_migration = ["migf"]
+    all_features = get_features(f)
+    # time-constant varaibles
+    features_time_constant = all_features['time_constant']
+    # time-varying variables
+    features_time_varying = all_features['time_varying']
+    # weather measures
+    features_weather = all_features['weather_vars']
+    # get weather names
+    weather_names = ['sociodemographics only'] + sorted( features_weather.keys() )
+    # weather_var = weather_names[i]
+    # set features for models
+    features = features_time_constant + features_time_varying
+
     # STORE VALUES HERE
     MODEL_OUTPUT = {}
-
     for i in range(no_models):
         # define names (to be used when STORING values)
-        features_set = "set_" + str(i)
+        features_set = "set_" + str(i) + "_" + data_structure
         # add dict to MODEL_OUTPUT
         MODEL_OUTPUT[i] = {}
 
-        for f in range(len(file_names)):
-            # LOAD DATA
-            mmp_data_weather = pd.read_csv(file_names[f])
+        # add weather_variables when needed
+        if i > 0:
+            if not isinstance(features_weather[weather_names[i]], list):
+                weather_vars = [ features_weather[weather_names[i]] ]
+            else:
+                weather_vars = features_weather[weather_names[i]]
+            # create features list
+            features = features + weather_vars
 
-            #####################################################################
-            #  S E L E C T   F E A T U R E S
-            #####################################################################
-            first_migration = ["migf"]
-            all_features = get_features(file_names[f])
-            # time-constant varaibles
-            features_time_constant = all_features['time_constant']
-            # time-varying variables
-            features_time_varying = all_features['time_varying']
-            # weather measures
-            features_weather = all_features['weather_vars']
-            # get weather names
-            weather_names = ['sociodemographics only'] + sorted( features_weather.keys() )
-            # weather_var = weather_names[i]
-            # set features for models
-            features = features_time_constant + features_time_varying
+        # remove missing values
+        tr = mmp_data_weather.loc[:, first_migration + features]
+        tr_subset = tr.dropna(axis=0, how="any")
 
-            # add weather_variables when needed
-            if i > 0:
-                if not isinstance(features_weather[weather_names[i]], list):
-                    weather_vars = [ features_weather[weather_names[i]] ]
-                else:
-                    weather_vars = features_weather[weather_names[i]]
-                # create features list
-                features = features + weather_vars
+        print("\nVariable number: " + str(weather_names[i]))
+        print("\tFile: " + f )
+        print("\tData subset shape:" + str(tr_subset.shape) + "\n")
 
+        #####################################################################
+        # B U I L D   M O D E L S
+        #####################################################################
 
-            # remove missing values
-            tr = mmp_data_weather.loc[:, first_migration + features]
-            tr_subset = tr.dropna(axis=0, how="any")
+        # C R E A T E   V A R I A B L E S
+        ###################################
+        # target vector
+        y = np.array(tr_subset.migf)
+        # features
+        X = np.array(tr_subset.loc[:,features ])
+        # train and test sets
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=200)
 
-            print("\nVariable number: " + str(weather_names[i]))
-            print("\tFile: " + file_names[f] )
-            print("\tData subset shape:" + str(tr_subset.shape) + "\n")
-            #####################################################################
-            # B U I L D   M O D E L S
-            #####################################################################
+        #  R A N D O M   F O R E S T
+        ###################################
+        # run Grid Search of Random Forest
+        rf_output = multiple_RF(X_train, y_train)
 
-            # C R E A T E   V A R I A B L E S
-            ###################################
-            # target vector
-            y = np.array(tr_subset.migf)
-            # features
-            X = np.array(tr_subset.loc[:,features ])
-            # train and test sets
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=200)
+        # L O G I S T I C   R E G R E S S I O N
+        ###################################
+        lr_output = logistic_regression_stat(X_train, y_train)
 
-            #  R A N D O M   F O R E S T
-            ###################################
-            # run Grid Search of Random Forest
-            rf_output = multiple_RF(X_train, y_train)
-
-            # L O G I S T I C   R E G R E S S I O N
-            ###################################
-            lr_output = logistic_regression_stat(X_train, y_train)
-
-            # S T O R E   O U T P U T
-            MODEL_OUTPUT[i].update( {data_structure[f]: {"rf": rf_output, "lr": lr_output} } )
+        # S T O R E   O U T P U T
+        MODEL_OUTPUT[features_set] = {"rf": rf_output, "lr": lr_output, "y_test": y_test, "X_test": X_test}
+        # MODEL_OUTPUT[i].update( {data_structure[f]: {"y_test": y_test, "X_test": X_test} } )
 
     return MODEL_OUTPUT
 
 
-
-
-
-
-
 def unpack_gridSearch(output_list):
-    best_models = []
-    for model in output_list:
-        best_models.append(model.best_estimator_)
+    best_models = {}
+    for model in range(len(output_list)):
+        best_models[model] = {}
+        for data_str in output_list[model]:
+            best_models[model].update({data_str: []})
+            for w in range(len(output_list[model][data_str]['rf'])):
+                best_models[model][data_str].append(output_list[model][data_str]['rf'][w].best_estimator_)
     return best_models
 
 
