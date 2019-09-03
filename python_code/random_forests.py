@@ -37,11 +37,10 @@ models_output = func_rf.run_RF(file_names, data_structure = "wide")
 
 
 # Extract best models from RF grid search
-rf_best = unpack_gridSearch(models_output, data_structure = "wide")
+rf_best = func_rf.unpack_gridSearch(models_output)
 
-
-
-
+# Calculate ROC values for each model
+roc_values = func_rf.ROC_curve_values(best_models, output_list)
 
 
 

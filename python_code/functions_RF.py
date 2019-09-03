@@ -319,23 +319,25 @@ def run_RF(file_names, data_structure):
     #####################################################################
     #  S E L E C T   F E A T U R E S
     #####################################################################
-    first_migration = ["migf"]
-    all_features = get_features(f)
-    # time-constant varaibles
-    features_time_constant = all_features['time_constant']
-    # time-varying variables
-    features_time_varying = all_features['time_varying']
-    # weather measures
-    features_weather = all_features['weather_vars']
-    # get weather names
-    weather_names = ['sociodemographics only'] + sorted( features_weather.keys() )
-    # weather_var = weather_names[i]
-    # set features for models
-    features = features_time_constant + features_time_varying
 
     # STORE VALUES HERE
     MODEL_OUTPUT = {}
     for i in range(no_models):
+        
+        first_migration = ["migf"]
+        all_features = get_features(f)
+        # time-constant varaibles
+        features_time_constant = all_features['time_constant']
+        # time-varying variables
+        features_time_varying = all_features['time_varying']
+        # weather measures
+        features_weather = all_features['weather_vars']
+        # get weather names
+        weather_names = ['sociodemographics only'] + sorted( features_weather.keys() )
+        # weather_var = weather_names[i]
+        # set features for models
+        features = features_time_constant + features_time_varying
+
         # define names (to be used when STORING values)
         features_set = "set_" + str(i) + "_" + data_structure
 
@@ -405,12 +407,11 @@ def ROC_curve_values(best_models, output_list):
     roc_models = {}
     for key, value in best_models:
         # accuracy prediciton
-
-        pred_train = model.predict(X_train)
-        pred_test = model.predict(X_test)
-        pred_probs = model.predict_proba(X_test) # probabilities
+        pred_train = model.predict(output_list[key]["X_train"])
+        pred_test = model.predict(output_list[key]["X_test"])
+        pred_probs = model.predict_proba(output_list[key]["X_test"]) # probabilities
         # ROC curve
-        fpr, tpr, _ = roc_curve(y_test, pred_probs[:,1])
+        fpr, tpr, _ = roc_curve(output_list[key]["y_test"], pred_probs[:,1])
         auc_value = auc(fpr, tpr)
         roc_models.append([fpr, tpr, auc_value])
     return roc_models
