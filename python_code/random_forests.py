@@ -30,14 +30,14 @@ data_structure = sorted(["long_aug", "wide", "long_noaug"])
 
 
 # RUN RANDOM FORESTS (this wil take a while...)
-#           It run 10 models for 3 different data structures using a Randomized grid search with Cross-validation.
+#           It runs 10 models for 3 different data structures using a Randomized grid search with Cross-validation.
 #           It also includes different weight schemes for each model.
-models_output = func_rf.run_RF(file_names, data_structure)
+models_output = func_rf.run_RF(file_names, data_structure = "wide")
 
-validation_vars = run_RF(file_names, data_structure)
+
 
 # Extract best models from RF grid search
-rf_best = unpack_gridSearch(file_names = models_output, data_structure = "wide")
+rf_best = unpack_gridSearch(models_output, data_structure = "wide")
 
 
 

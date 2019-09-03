@@ -37,22 +37,26 @@ library(velox)
 library(rgdal)
 library(rgeos)
 library(maps)
+library(maptools)
 library(mapdata)
 library(parallel)
 library(data.table)
 library(vioplot)
+library(classInt)
 library(RColorBrewer)
+library(foreign)
 library(ggmap)      # get geocodes with google (api key is needed)
 ##################################################################################################
 
 
 #################################   P A T H S   ########################################
 ####
+# get host name of machine
 hostname = system('uname -n',intern=T) 
 
 if(hostname=="molina") {
   path.footprint = "/home/mario/Documents/environment_data/humanfootprint/"
-  path.shapefiles = "/home/mario/Documents/environment_data/mexican_shapefiles/"
+  path.shapefiles = "/home/mario/Documents/environment_data/"
   path.ra_filiz = "/home/mario/mm2535@cornell.edu/projects/ra_filiz"
   path.git = "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration"
   tmp = '/home/mario/Documents/environment_data/mexican_shapefiles/tmp_folder'
@@ -113,7 +117,17 @@ setwd( path.git )
 source("create_plots.R")
 
 ##################################################################################################
+# Create several climate change variables form ML models
+setwd( path.git )
+source("create_weather_data_for_ML_models.R")
+
+##################################################################################################
 # Extract geocodes from crossing points for Mexican municipalities
 setwd( path.git )
 source("extract_geocode_crossing_points.R")
+
+##################################################################################################
+# Graph migration over time in Mexico's map (using all MMP data)
+setwd( path.git )
+source("plot_migration_over_time_mexico_map.R")
 

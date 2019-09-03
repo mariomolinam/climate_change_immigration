@@ -92,7 +92,7 @@ def select_data(mmp_data, data_structure):
         cond = year <= mmp_data.usyr1
         mmp_data = mmp_data.loc[ cond , ]
 
-    # FILTER 3: remove all observations (MIGRANTS and NON-MIGRANTS) that
+# FILTER 3: remove all observations (MIGRANTS and NON-MIGRANTS) that
     #           have entries before our first year with weather
     #           information (1980).
     mmp_data = mmp_data.loc[ mmp_data.year >= "1980" , ]
@@ -118,7 +118,7 @@ def correct_migrants(mmp_data):
     # set multiIndex: "persnum", "year"
     subset.set_index(["persnum", "year"], inplace=True)
 
-    # check migrants with all 0 in "migf" and then obtain indices for persnum
+    # check migrants with all 0 in "migf" and then obtain indices for persnum'
     check_mig = subset.migf.sum(level=0)
     check_mig_idx = check_mig.apply(lambda x: "1" not in x).to_numpy().nonzero()[0]
     subset_idx_persnum = check_mig.iloc[check_mig_idx].index.get_level_values(0)
@@ -141,6 +141,38 @@ def correct_migrants(mmp_data):
     return mmp_data_multi
 
 
+def select_five_year_points(resp):
+    """
+    Input: pands dataframe (mmp) from function groupby (used in function keep_five_person_year())
+
+    Task:
+        - It selects 5 rows from dataframe coming from groupby function using
+        level=0 (i.e. persnum from MMP survey).
+        - It distinguishes from non-migrants and migrants, such that if
+        respondent is non-migrant, then the year from which non-migrant history will
+        considered is randomly chosen, and then it selects the past 5 years from this
+        starting point. If migrant, then it selects the first 5 rows. Rows are ordered by year.
+
+    Return: pandas dataframe (mmp)
+    """
+
+    # check if non-migrant or miragtn
+    if sum(resp.usyr1.isin(['8888'])) > 0:
+        # if there are more than 5 rows, then ramdoly choose the starting year.
+        if resp.shape[0] > 5:
+            idx_range = range(resp.shape[0])[4:]
+            random_idx = int(np.random.choice(idx_range, size=1))
+            idx_random_range = range(random_idx-4, random_idx+1)
+            # print(idx_random_range)
+            output = resp.iloc[idx_random_range,:]
+        else:
+            output = resp.iloc[:5,:]
+    else:
+        output = resp.iloc[:5,:]
+
+    return output
+
+
 def keep_five_person_year(mmp_data):
     """
     Input: pandas dataframe (mmp)
@@ -154,7 +186,8 @@ def keep_five_person_year(mmp_data):
     mmp_data.sort_index(level=["persnum","year"], ascending=False, inplace=True)
 
     print("Keeping up to 5 years per person. Please wait...")
-    mmp_data_five = mmp_data.groupby(level=0).apply(lambda x: x.iloc[:5,:])
+    # for migrants select the past 5 years if they exist
+    mmp_data_five = mmp_data.groupby(level=0).apply(lambda x: select_five_year_points(x))
     print("Done!")
 
     mmp_data_five.reset_index(level=0, drop=True, inplace=True)
