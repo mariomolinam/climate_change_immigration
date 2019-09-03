@@ -304,14 +304,14 @@ def logistic_regression_stat(X_train, y_train):
 
 def run_RF(file_names, data_structure):
     # number of models
-    no_models = 10  # includes: LogisticRegression and RF with sociodemographics only (+2)
-            #           RF with 9 different climate change variables (+9)
+no_models = 10  # includes: LogisticRegression and RF with sociodemographics only (+2)
+        #           RF with 9 different climate change variables (+9)
 
-    # define type of file
-    for file in file_names:
-        if data_structure in file:
-            f = file
-            break
+# define type of file
+for file in file_names:
+    if data_structure in file:
+        f = file
+        break
 
     # LOAD DATA
     mmp_data_weather = pd.read_csv(f)
@@ -338,9 +338,7 @@ def run_RF(file_names, data_structure):
     for i in range(no_models):
         # define names (to be used when STORING values)
         features_set = "set_" + str(i) + "_" + data_structure
-        # add dict to MODEL_OUTPUT
-        MODEL_OUTPUT[i] = {}
-
+        
         # add weather_variables when needed
         if i > 0:
             if not isinstance(features_weather[weather_names[i]], list):
