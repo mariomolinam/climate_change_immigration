@@ -379,7 +379,13 @@ def run_RF(file_names, data_structure):
         lr_output = logistic_regression_stat(X_train, y_train)
 
         # S T O R E   O U T P U T
-        MODEL_OUTPUT[features_set] = {"rf": rf_output, "lr": lr_output, "y_test": y_test, "X_test": X_test}
+        MODEL_OUTPUT[features_set] = {  "rf": rf_output,
+                                        "lr": lr_output,
+                                        "y_test": y_test,
+                                        "X_test": X_test,
+                                        "X_train":X_train,
+                                        "y_train":y_train
+                                     }
         # MODEL_OUTPUT[i].update( {data_structure[f]: {"y_test": y_test, "X_test": X_test} } )
 
     return MODEL_OUTPUT
@@ -387,19 +393,19 @@ def run_RF(file_names, data_structure):
 
 def unpack_gridSearch(output_list):
     best_models = {}
-    for model in range(len(output_list)):
-        best_models[model] = {}
-        for data_str in output_list[model]:
-            best_models[model].update({data_str: []})
-            for w in range(len(output_list[model][data_str]['rf'])):
-                best_models[model][data_str].append(output_list[model][data_str]['rf'][w].best_estimator_)
+    for model in range(10):
+        key = "set_" + str(model) + "_wide"
+        best_models[key] = []
+        for w in range(len(output_list[key]['rf'])):
+            best_models[key].append(output_list[key]['rf'][w].best_estimator_)
     return best_models
 
 
-def ROC_curve_values(best_models, y_test):
-    roc_models = []
-    for model in best_models:
+def ROC_curve_values(best_models, output_list):
+    roc_models = {}
+    for key, value in best_models:
         # accuracy prediciton
+
         pred_train = model.predict(X_train)
         pred_test = model.predict(X_test)
         pred_probs = model.predict_proba(X_test) # probabilities
