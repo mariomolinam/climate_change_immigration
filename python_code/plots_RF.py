@@ -21,26 +21,29 @@ import sys
 path_data = "/home/mario/Documents/environment_data/mmp_data"
 path_git = "/home/mario/mm2535@cornell.edu/projects/ra_filiz/climate_change_immigration"
 
-def ROC_curve(np_array_fpr, weather_names):
+def ROC_curve(roc_values, weather_names):
     # plot no skill
-    plt.figure()
-    plt.title("ROC Curve")
+    plt.figure(figsize=(15,8))
+    plt.title("ROC Curve - Weights 1:100000000")
     # plot the 45 degrees lines
     plt.plot([0, 1], [0, 1], linestyle='--', color="black")
     # add fpr and tpr
     colors = [  "red", "maroon", "darkgoldenrod", "olivedrab", "blue",
                 "indigo", "darkorange", "cyan", "dodgerblue", "lawngreen"]
-    for i in range(len(np_array_fpr)):
-        fpr, tpr, auc = np_array_fpr.values()[i]
+    counter = 0
+    for key, values in roc_values.items():
+        fpr, tpr, auc = values[1]["fpr"], values[1]["tpr"], values[1]["auc_value"]
         # true positive rate against false positive rate
-        label_legend = weather_names[i] + " - (AUC: " + str(round(auc, 3)) + ")"
-        plt.plot(fpr,tpr, linestyle='-', color=colors[i], label=label_legend)
+        label_legend = weather_names[counter] + " - (AUC: " + str(round(auc, 3)) + ")"
+        plt.plot(fpr,tpr, linestyle='-', color=colors[counter], label=label_legend)
+        counter += 1
+
     # plt.plot(recall_socio, precision_socio, marker='.', color="b", label="Random Forest without prcp lags")
     plt.xlabel("False Positive Rate")
     plt.ylabel("True Positive Rate")
     plt.legend(loc='lower right', frameon=False, fontsize=10)
     # plt.show()
-    fig_name = path_git + "/results/ROC_curve.png"
+    fig_name = path_git + "/results/ROC_curve_weights_ratio_1_100000000.png"
     plt.savefig(fig_name, bbox_inches='tight')
 
 

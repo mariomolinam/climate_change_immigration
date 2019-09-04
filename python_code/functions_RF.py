@@ -291,7 +291,7 @@ def logistic_regression_stat(X_train, y_train):
                                  intercept_scaling = 1,
                                  class_weight = None,
                                  solver = "saga", # optimization algorithm
-                                 max_iter = 500
+                                 max_iter = 1000
                               )
         #
         print('.'*60)
@@ -302,7 +302,7 @@ def logistic_regression_stat(X_train, y_train):
         return output
 
 
-def run_RF(file_names, data_structure):
+def run_RF(file_names, data_structure, model_type):
         # number of models
     no_models = 10  # includes: LogisticRegression and RF with sociodemographics only (+2)
             #           RF with 9 different climate change variables (+9)
@@ -323,7 +323,7 @@ def run_RF(file_names, data_structure):
     # STORE VALUES HERE
     MODEL_OUTPUT = {}
     for i in range(no_models):
-        
+
         first_migration = ["migf"]
         all_features = get_features(f)
         # time-constant varaibles
@@ -371,11 +371,13 @@ def run_RF(file_names, data_structure):
         # train and test sets
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=200)
 
+
+        # if model_type == "rf":
         #  R A N D O M   F O R E S T
         ###################################
         # run Grid Search of Random Forest
         rf_output = multiple_RF(X_train, y_train)
-
+        # else:
         # L O G I S T I C   R E G R E S S I O N
         ###################################
         lr_output = logistic_regression_stat(X_train, y_train)
@@ -405,15 +407,23 @@ def unpack_gridSearch(output_list):
 
 def ROC_curve_values(best_models, output_list):
     roc_models = {}
-    for key, value in best_models:
-        # accuracy prediciton
-        pred_train = model.predict(output_list[key]["X_train"])
-        pred_test = model.predict(output_list[key]["X_test"])
-        pred_probs = model.predict_proba(output_list[key]["X_test"]) # probabilities
-        # ROC curve
-        fpr, tpr, _ = roc_curve(output_list[key]["y_test"], pred_probs[:,1])
-        auc_value = auc(fpr, tpr)
-        roc_models.append([fpr, tpr, auc_value])
+    count = 0
+    for key, value in best_models.items():
+        count += 1
+        print(count)
+        roc_models[key] = {}
+        for m in range(len(value)):
+            # accuracy prediciton
+            pred_train = value[m].predict( output_list[key]["X_train"] )
+            pred_test = value[m].predict(output_list[key]["X_test"])
+            pred_probs = value[m].predict_proba(output_list[key]["X_test"]) # probabilities
+            # ROC curve
+            fpr, tpr, _ = roc_curve(output_list[key]["y_test"], pred_probs[:,1])
+            auc_value = auc(fpr, tpr)
+            # roc_models.append([fpr, tpr, auc_value])
+            # update dictionary
+            roc_models[key].update({ m:{"fpr":fpr, "tpr":tpr, "auc_value":auc_value,
+                                        "pred_test":pred_test, "pred_train":pred_train, "pred_probs":pred_probs[:,1]} })
     return roc_models
 
 
