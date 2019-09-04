@@ -302,7 +302,7 @@ def logistic_regression_stat(X_train, y_train):
         return output
 
 
-def run_RF(file_names, data_structure, model_type):
+def run_RF(file_names, data_structure):
         # number of models
     no_models = 10  # includes: LogisticRegression and RF with sociodemographics only (+2)
             #           RF with 9 different climate change variables (+9)
