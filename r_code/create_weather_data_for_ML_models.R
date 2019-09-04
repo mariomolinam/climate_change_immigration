@@ -17,15 +17,23 @@ env = read.dta("./mmp_data/environs.dta")
 setwd(path.shapefiles)
 # 1. CRUDE PRCP
 write.csv( x = crude_weather_yearly(data=prcp.mmp, weather="prcp", operation="sum"),
-           file = "./mmp_data/crude_raw_prcp_monthly-average_mmp_1980-2017.csv", row.names = FALSE)
+           file = "./mmp_data/crude_raw_prcp_yearly-average_mmp_1980-2017.csv", row.names = FALSE )
+
+write.csv( x = convert_weather_monthly(data=prcp.mmp, weather="prcp", operation="sum"),
+           file = "./mmp_data/crude_raw_prcp_monthly-average_mmp_1980-2017.csv", row.names = FALSE )
 
 # 2. CRUDE TMAX: raw temperature
 write.csv( x = crude_weather_yearly(data=tmax.mmp, weather="tmax", operation="mean"),
+           file = "./mmp_data/crude_raw-tmax_yearly-average_mmp_1980-2017.csv", row.names = FALSE)
+
+write.csv( x = convert_weather_monthly(data=tmax.mmp, weather="tmax", operation="mean"),
            file = "./mmp_data/crude_raw-tmax_monthly-average_mmp_1980-2017.csv", row.names = FALSE)
 
 # 3. CRUDE TMAX: number of days > 30
 write.csv( x = crude_weather_yearly(data=tmax.mmp, weather="tmax", operation="above30"),
           file = "./mmp_data/crude_above30-tmax_monthly-average_mmp_1980-2017.csv", row.names = FALSE)
+
+
 
 # 4. NORM DEVIATION, LONG-TERM NORM 1960-1979: precipitation
 write.csv( x = long_term_norm_deviation(data=prcp.mmp, data_historic=env, weather="prcp"),
