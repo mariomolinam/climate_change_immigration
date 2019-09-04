@@ -273,36 +273,36 @@ def multiple_RF(X_train, y_train):
 
 
 def logistic_regression_stat(X_train, y_train):
-        """
-        Input:  Paramaters for Logistic Regression:
+    """
+    Input:  Paramaters for Logistic Regression:
 
-                X_train, y_train, X_test, y_test: numpy arrays
-                weights: dict
+            X_train, y_train, X_test, y_test: numpy arrays
+            weights: dict
 
-        Task: run logistic regression and predict:
-                - using train data (X_train)
-                - using test data (Y_test)
+    Task: run logistic regression and predict:
+            - using train data (X_train)
+            - using test data (Y_test)
 
-        Return: dictionary
-        """
-        # random_grid = set_params_grid_search()
-        lr = LogisticRegression( penalty = "none",
-                                 fit_intercept = True,
-                                 intercept_scaling = 1,
-                                 class_weight = None,
-                                 solver = "saga", # optimization algorithm
-                                 max_iter = 1000
-                              )
-        #
-        print('.'*60)
-        print("\tEstimating a logistic regression..\n")
-        output = lr.fit(X_train, y_train)
-        print("\n\tDone!\n\n")
-        print('.'*60)
-        return output
+    Return: dictionary
+    """
+    # random_grid = set_params_grid_search()
+    lr = LogisticRegression( penalty = "none",
+                             fit_intercept = True,
+                             intercept_scaling = 1,
+                             class_weight = None,
+                             solver = "lbfgs", # optimization algorithm
+                             max_iter = 10000
+                          )
+    #
+    print('.'*60)
+    print("\tEstimating a logistic regression..\n")
+    output = lr.fit(X_train, y_train)
+    print("\n\tDone!\n\n")
+    print('.'*60)
+    return output
 
 
-def run_RF(file_names, data_structure):
+def run_RF(file_names, data_structure, model_type):
         # number of models
     no_models = 10  # includes: LogisticRegression and RF with sociodemographics only (+2)
             #           RF with 9 different climate change variables (+9)
@@ -372,19 +372,18 @@ def run_RF(file_names, data_structure):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=200)
 
 
-        # if model_type == "rf":
-        #  R A N D O M   F O R E S T
-        ###################################
-        # run Grid Search of Random Forest
-        rf_output = multiple_RF(X_train, y_train)
-        # else:
-        # L O G I S T I C   R E G R E S S I O N
-        ###################################
-        lr_output = logistic_regression_stat(X_train, y_train)
+        if model_type == "rf":
+            #  R A N D O M   F O R E S T
+            ###################################
+            # run Grid Search of Random Forest
+            output = multiple_RF(X_train, y_train)
+        else:
+            # L O G I S T I C   R E G R E S S I O N
+            ###################################
+            output = logistic_regression_stat(X_train, y_train)
 
         # S T O R E   O U T P U T
-        MODEL_OUTPUT[features_set] = {  "rf": rf_output,
-                                        "lr": lr_output,
+        MODEL_OUTPUT[features_set] = {  model_type: output,
                                         "y_test": y_test,
                                         "X_test": X_test,
                                         "X_train":X_train,

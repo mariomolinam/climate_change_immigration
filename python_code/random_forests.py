@@ -41,7 +41,8 @@ weather_names = [ 'sociodemographics only',
 # RUN RANDOM FORESTS (this wil take a while...)
 #           It runs 10 models for 3 different data structures using a Randomized grid search with Cross-validation.
 #           It also includes different weight schemes for each model.
-models_output = func_rf.run_RF(file_names, data_structure = "wide")
+models_output_rf = func_rf.run_RF(file_names, data_structure = "wide", model_type="rf")
+models_output_lr = func_rf.run_RF(file_names, data_structure = "wide", model_type="lr")
 
 
 
