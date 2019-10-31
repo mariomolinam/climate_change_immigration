@@ -44,3 +44,6 @@ We provide information for the task performed by each file. Importantly, these f
       7. norm percentage for precipitation: SHORT-term norm between 1980-1984.
       8. norm percentage for max temperature: SHORT-term norm between 1980-1984.
       9. warm spells: number of times there are 6 consecutive days with temperature higher than SHORT-norm 1980-1984.
+  * It relies on function contained in the file `functions_weather_data_for_ML_models.R`.
+
+-
