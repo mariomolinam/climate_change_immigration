@@ -35,7 +35,7 @@ We provide information for the task performed by each file. Importantly, these f
 
 - `create_weather_data_for_ML_models.R`:
   * This file creates 9 measures of climate change using weather stressors:
-    1. raw precipitation.
+    *1.* raw precipitation.
     2. raw max temperature.
     3. rax max temperature: number of days > 30 degrees (Celcius).
     4. norm deviation for precipitation: LONG-term norm between 1960-1979.
