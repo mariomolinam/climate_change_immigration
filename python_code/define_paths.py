@@ -1,3 +1,5 @@
+import sys, os, socket
+
 # DEFINE PATHS depending on hostname server
 hostname = socket.gethostname()
 if hostname == 'molina':
