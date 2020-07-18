@@ -1,19 +1,25 @@
-# 
-setwd(path.git)
-source("./r_code/functions_weather_data_for_ML_models.R")
 
 ###########################################################################
 ######################### W E A T H E R
 # R E A D   D A T A
 ########################################################################
 setwd( path.shapefiles )
+
+# weather datasets
 prcp.mmp = as.data.frame(fread("./mexican_shapefiles/mmp_w_prcp.csv"))
 tmax.mmp = as.data.frame(fread("./mexican_shapefiles/mmp_w_tmax.csv"))
+tmin.mmp = as.data.frame(fread("./mexican_shapefiles/mmp_w_tmin.csv"))
+
+# mmp data
 env = read.dta("./mmp_data/environs.dta")
+
+# crop dataset (with geocodes and weather conditions)
+crop = fread("./Mexico crop data/top_crops_sorted_w_info.csv")
 
 
 #  C R E A T E   D A T A   F O R   M L   M O D E L S
 ###############################################################
+
 setwd(path.shapefiles)
 # 1. CRUDE PRCP
 write.csv( x = crude_weather_yearly(data=prcp.mmp, weather="prcp", operation="sum"),
@@ -58,3 +64,21 @@ write.csv( x = short_term_norm_percent(data=tmax.mmp, weather="tmax", operation=
 # 9. WARM SPELLS: NUMBER OF TIMES THERE ARE 6 CONSECUTIVES DAYS WITH TEMPERATURE > SHORT NORM 1980-1984
 write.csv( x = warm_spells(data=tmax.mmp, weather="tmax", operation="mean"),
            file = "./mmp_data/warm_spell_tmax_mmp_1985-2017.csv", row.names = FALSE)
+
+
+# DEVIATIONS FROM WEATHER INFORMATION BASED ON CROPS
+#########################################################
+
+# crop dataset: divide for state and for municipality
+crop = geocode_char(crop)
+
+crop_est = crop[ nchar(geocode_char) == 2 ]
+crop_mun = crop[ nchar(geocode_char) > 2 ]
+
+
+# weather dataset: add ID for state and for municipality
+tmin.mmp = geocode_char(tmin.mmp)
+
+# 10. YEARLY DEVIATION: tmax BASED ON CROP PRODUCTION
+# weather data at the state level
+devs = weather_deviations(tmin.mmp, crop_est, weather="tmin", type="est")

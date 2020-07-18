@@ -40,7 +40,7 @@ for(d in 1:length(unique(decade_vals)[1:3])){
 
 assign_class = function(x, qtls){
   if( length(x) > 2 ) stop("You're using a dataframe with more than 2 columns...This isn't going to work!")
-  state = as.numeric(as.character(x[1]))
+  state = x[1]
   val = as.numeric(x[2])
   quantiles = qtls[qtls[,"state"] == state,]
   if(is.na(val)){
@@ -79,62 +79,74 @@ for(m in 1:length(months)){
   # get data
   d = state_average[,c("state", col_month)]
   
-  seq_cols = seq(2,39,5)[-8]
-  five_years_names = c()
+  # ten years names: extract from columns in d
+  seq_cols = seq(2,39,10)
+  ten_years_names = c()
   for(i in 1:length(seq_cols)){
     col1 = seq_cols[i]
-    col2 = seq_cols[i] + 4
-    if(i==7) col2=39
+    col2 = seq_cols[i] + 9
+    if(i==4) col2=39
     start = gsub("\\D","", colnames(d[,c(col1:col2)]))[1]
     end = gsub("\\D","", colnames(d[,c(col1:col2)]))[length(col1:col2)]
     col_name = paste0(start,"-",end)
-    five_years_names[i] = col_name
+    ten_years_names[i] = col_name
     # update d and colname
     d = cbind(d, rowMeans(d[,c(col1:col2)]))
     colnames(d)[ncol(d)] = col_name
   }
   
-  # add to Mexico's shapefile 
-  mx.ent@data = merge(mx.ent@data, d[,c("state",five_years_names)], by.x="CVE_ENT", by.y="state", all.x=TRUE, suffixes=c("",""))
+  # change state id to character (to properly merge with raster data)
+  d$state = sapply(as.character(d$state), function(x) if(nchar(x)==1) paste0("0",x) else x=x)
   
-  # define quantile within state to assign appropriate colors
+  
+  # add to Mexico's shapefile 
+  mx.ent@data = merge(mx.ent@data, d[,c("state",ten_years_names)], by.x="CVE_ENT", by.y="state", all.x=TRUE, suffixes=c("",""))
+  
+  # define quantile WITHIN state to assign appropriate colors
   state_val_quantile = t(apply(d[,2:39], 1, quantile))
-  state_val_quantile = cbind(state=d$state, state_val_quantile)
-  class_names = c("No data", "1st Quartile", "2nd Quartile", "3rd Quartile", "4th Quartile")
+  state_val_quantile_colnames = colnames(state_val_quantile)
+  state_val_quantile = data.frame(state=d$state, state_val_quantile)
+  state_val_quantile$state = as.character(state_val_quantile$state)
+  
+  colnames(state_val_quantile) = c("state", state_val_quantile_colnames)
+  
+  class_names = c("No data","1st Quartile", "2nd Quartile", "3rd Quartile", "4th Quartile")
   
   setwd(path.git)
   file_name = paste0("./results/prcp_raw_map_",tolower(months[m]),".tiff")
-  bitmap(file_name, height=7, width=20,units="in",type="tiff24nc",res=150)
+  bitmap(file_name, height=8, width=12,units="in",type="tiff24nc",res=200)
   
   # DEFINE PAR
-  par(mfrow=c(2,4), mai = c(0.2,0.2,0.2,0.2))
+  par(mfrow=c(2,2), bg="black") #mai = c(0.2,0.2,0.2,0.2)
       
-  
-  for(y in 1:length(five_years_names)){
+  for(y in 1:length(ten_years_names)){
     
     # assign values to classes
-    year_name = five_years_names[y]
+    year_name = ten_years_names[y]
     class = apply(mx.ent@data[,c("CVE_ENT",year_name)], 1, function(x) assign_class(x, state_val_quantile))
     
     # COLORS
     ncolors = 9
-    colors_pal = brewer.pal(ncolors,"Blues")[seq(1,9,2)]
+    colors_pal = brewer.pal(ncolors,"Blues")[c(2,5,7,9)]
+    colors_pal = c("black",colors_pal)
     names(colors_pal) = class_names
     class_color = colors_pal[match(class, names(colors_pal))]
   
     # PLOT
-    plot(mx.ent[,year_name], col=class_color)
+    plot( mx.ent[,year_name], col=class_color, border="white" )
+    plot(mx.ent[which(class=="No data"),year_name], col="white", density=30, border="white",add=TRUE)
+    
     
     # title = paste0("Mexican Migration to the US (", t,")")
     title = paste(months[m], year_name)
-    text(2500000, 2400000, title, font=2, cex=1.4)
-    legend(3200000, 2200000, legend=names(colors_pal),
-           fill=colors_pal, cex=1.2, bty="n", border="white")
+    text(2800000, 2350000, title, font=2, cex=1.4, col="white")
+    legend(3200000, 2200000, legend=names(colors_pal)[2:5],
+           fill=colors_pal[2:5], cex=1, bty="n", border="white",
+           text.col = "white", title="Rainfall")
   
   }
   # close figure
   dev.off()
-  
 }
 
 
@@ -184,7 +196,7 @@ temp_names = colnames(temp)[-c(1,2)]
 
 assign_class = function(x, qtls){
   if( length(x) > 2 ) stop("You're using a dataframe with more than 2 columns...This isn't going to work!")
-  state = as.numeric(as.character(x[1]))
+  state = x[1]
   val = as.numeric(x[2])
   quantiles = qtls[qtls[,"state"] == state,]
   if(is.na(val)){
@@ -217,64 +229,75 @@ for(m in 1:length(months)){
   mx.ent@data = mx.ent@data[,c("CVE_ENT", "NOMGEO")]
   cat('Done!', '\n')
   
-  
   # get right months across years  
   col_month = colnames(temp)[grepl(tolower(months[m]), colnames(temp))]
   
   # get data
   d = state_average[,c("state", col_month)]
   
-  seq_cols = seq(2,39,5)[-8]
-  five_years_names = c()
+  # ten years names: extract from columns in d
+  seq_cols = seq(2,39,10)
+  ten_years_names = c()
   for(i in 1:length(seq_cols)){
     col1 = seq_cols[i]
-    col2 = seq_cols[i] + 4
-    if(i==7) col2=39
+    col2 = seq_cols[i] + 9
+    if(i==4) col2=39
     start = gsub("\\D","", colnames(d[,c(col1:col2)]))[1]
     end = gsub("\\D","", colnames(d[,c(col1:col2)]))[length(col1:col2)]
     col_name = paste0(start,"-",end)
-    five_years_names[i] = col_name
+    ten_years_names[i] = col_name
     # update d and colname
     d = cbind(d, rowMeans(d[,c(col1:col2)]))
     colnames(d)[ncol(d)] = col_name
   }
   
+  # change state id to character (to properly merge with raster data)
+  d$state = sapply(as.character(d$state), function(x) if(nchar(x)==1) paste0("0",x) else x=x)
+  
   # add to Mexico's shapefile 
-  mx.ent@data = merge(mx.ent@data, d[,c("state",five_years_names)], by.x="CVE_ENT", by.y="state", all.x=TRUE, suffixes=c("",""))
+  mx.ent@data = merge(mx.ent@data, d[,c("state",ten_years_names)], by.x="CVE_ENT", by.y="state", all.x=TRUE, suffixes=c("",""))
   
-  # define quantile within state to assign appropriate colors
+  # define quantile WITHIN state to assign appropriate colors
   state_val_quantile = t(apply(d[,2:39], 1, quantile))
-  state_val_quantile = cbind(state=d$state, state_val_quantile)
-  class_names = c("No data", "1st Quartile", "2nd Quartile", "3rd Quartile", "4th Quartile")
+  state_val_quantile_colnames = colnames(state_val_quantile)
+  state_val_quantile = data.frame(state=d$state, state_val_quantile)
+  state_val_quantile$state = as.character(state_val_quantile$state)
   
+  colnames(state_val_quantile) = c("state", state_val_quantile_colnames)
+  
+  class_names = c("No data","1st Quartile", "2nd Quartile", "3rd Quartile", "4th Quartile")
+  
+  # set path to save figures
   setwd(path.git)
   file_name = paste0("./results/tmax_raw_map_",tolower(months[m]),".tiff")
-  bitmap(file_name, height=7, width=20,units="in",type="tiff24nc",res=150)
+  bitmap(file_name, height=8, width=12,units="in",type="tiff24nc",res=200)
   
   # DEFINE PAR
-  par(mfrow=c(2,4), mai = c(0.2,0.2,0.2,0.2))
+  par(mfrow=c(2,2), bg="black") #mai = c(0.2,0.2,0.2,0.2)
   
-  
-  for(y in 1:length(five_years_names)){
+  for(y in 1:length(ten_years_names)){
     
     # assign values to classes
-    year_name = five_years_names[y]
+    year_name = ten_years_names[y]
     class = apply(mx.ent@data[,c("CVE_ENT",year_name)], 1, function(x) assign_class(x, state_val_quantile))
     
     # COLORS
     ncolors = 9
-    colors_pal = brewer.pal(ncolors,"Reds")[seq(1,9,2)]
+    colors_pal = brewer.pal(ncolors,"Reds")[c(2,5,7,9)]
+    colors_pal = c("black", colors_pal)
     names(colors_pal) = class_names
     class_color = colors_pal[match(class, names(colors_pal))]
     
     # PLOT
-    plot(mx.ent[,year_name], col=class_color)
+    plot(mx.ent[,year_name], col=class_color, border="white")
+    plot(mx.ent[which(class=="No data"),year_name], col="white", density=30, border="white",add=TRUE)
     
     # title = paste0("Mexican Migration to the US (", t,")")
     title = paste(months[m], year_name)
-    text(2500000, 2400000, title, font=2, cex=1.4)
-    legend(3200000, 2200000, legend=names(colors_pal),
-           fill=colors_pal, cex=1.2, bty="n", border="white")
+    text(2800000, 2350000, title, font=2, cex=1.4, col="white")
+    legend(3200000, 2200000, legend=names(colors_pal)[2:5],
+           fill=colors_pal[2:5], cex=1, bty="n", border="white",
+           text.col = "white", title="Max Temperature")
     
   }
   # close figure

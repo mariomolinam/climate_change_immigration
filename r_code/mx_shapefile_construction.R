@@ -3,7 +3,7 @@
 setwd(path.shapefiles)
 
 
-all.files = list.files(pattern='.zip') # only zip files
+all.files = list.files(path="./mexican_shapefiles",pattern='.zip') # only zip files
 if(! 'mx_sh' %in% list.files()) dir.create('mx_sh') # create directory to store MX shapefiles
 
 
@@ -13,15 +13,15 @@ for(i in 1:length(all.files)){
   file.name = all.files[i] 
   cat('\n', file.name, '\n\n')  # print
   # unzip file
-  files = unzip(file.name, exdir='tmp_folder')   
+  files = unzip(paste0("./mexican_shapefiles/",file.name), exdir='./mexican_shapefiles/tmp_folder')   
   conjunto = list.files(tmp)[grep('conjunto', list.files(tmp))]
   # build path to tmp folder
-  build_path = paste0("tmp_folder/",conjunto, '/.') 
+  build_path = paste0("./mexican_shapefiles/tmp_folder/",conjunto, '/.') 
   # extract file pattern to unzip
   pattern = paste0( substr(file.name, 1,2),                  
                   c('m', 'ar', 'territorio_insular') ) # 'a' excluded
   # remove island query if non-existent
-  if( length(grep('territorio_insular', files)) == 0 ) pattern = pattern[-3]
+  if( length(grep('territorio_insular', files)) == 0 ) pattern = pattern[-length(pattern)]
   
   # # load object if it exists
   # if(i > 1){
@@ -30,12 +30,15 @@ for(i in 1:length(all.files)){
   #   cat('Done!', '\n\n')
   # }
   
+  # if(i==21) pattern = c(pattern,"lpr")
+  
   # loop over shapefiles
   for(l in 1:length(pattern)){
     # read shapefile
     f.read = readOGR(dsn = build_path, layer = pattern[l])
-    f.read = readOGR(dsn = build_path, layer = "01mun")
-    # it fixs problem with invalid multibyte string
+    
+    # f.read = readOGR(dsn = build_path, layer = "01mun")
+    # it fixes problem with invalid multibyte string
     f.read@data[,'NOMBRE'] = iconv(f.read$NOMBRE)
     if(l==1) {
       # create shapefile  
@@ -47,7 +50,7 @@ for(i in 1:length(all.files)){
       }
     }
     # delete tmp folder
-    unlink('tmp_folder/', recursive = TRUE)
+    unlink('./mexican_shapefiles/tmp_folder/', recursive = TRUE)
     # summary info shapefile
     print(summary(shapefile))
     

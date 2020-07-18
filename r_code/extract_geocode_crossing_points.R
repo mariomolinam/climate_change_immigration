@@ -5,7 +5,7 @@
 setwd(path.git)
 
 # read MMP geo codes
-cross_pts = read_xlsx("CrossingPlace_GPSInfo.xlsx")
+cross_pts = read_xlsx("./data/CrossingPlace_GPSInfo.xlsx")
 cross_pts = as.data.frame(cross_pts)
 
 # make geocodes characters
@@ -18,11 +18,11 @@ crossing_points_names = paste0(cross_pts$placename, ", Mexico")
 # GOOGLE MAPS
 #########################################
 # use google maps to get crossing points at Mexican border
-crossing_filename = "crossing_points.csv"
+crossing_filename = "./data/crossing_points.csv"
 if( ! crossing_filename %in% list.files(path.git)) {
 
   # get google api key
-  myAPIkey = readLines("google.api")
+  myAPIkey = readLines("./data/google.api")
   register_google(key = myAPIkey)
   
   # crosing points for Mexican border

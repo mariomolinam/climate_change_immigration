@@ -67,6 +67,6 @@ for(g in 1:length(unique.geo)){
 }
 
 # save mmp with human footprint data
-setwd(path.ra_filiz)
+setwd(path.git)
 write.csv(mmp, 'mmp_w_footprint.csv', row.names=FALSE)
 
