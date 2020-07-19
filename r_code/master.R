@@ -8,7 +8,7 @@ gc() # garbage collection
 ###  I F   I N    S D L  1
 # libraries
 # local.lib = '/home/mm2535/R/x86_64-pc-linux-gnu-library'
-#
+# 
 # library(readxl, lib=local.lib)
 # library(sp, lib=local.lib)
 # library(raster, lib=local.lib)
@@ -58,15 +58,15 @@ if(hostname=="molina") {
   path.shapefiles = "/home/mario/Documents/environment_data/"
   path.git = "/home/mario/mm2535@cornell.edu/projects/migration_climate_change/climate_change_immigration"
   tmp = '/home/mario/Documents/environment_data/mexican_shapefiles/tmp_folder'
-}else if(hostname=="sdl1"){
+  # In external drive
+  path.daymet = "/media/mario/Seagate Backup Plus Drive/daymet_data"
+} else if(hostname=="sdl1"){
   path.shapefiles = '/home/mm2535/documents/data/immigration_data'
   path.git = "/home/mm2535/documents/climate_change_immigration"
   path.daymet = "/home/mm2535/documents/data/climate_change/daymet"
   tmp = '/home/mm2535/documents/data/immigration_data/tmp_folder'
 }
 
-# In external drive
-path.daymet = "/media/mario/Seagate Backup Plus Drive/daymet_data"
 
 
 #################################   F U N C T I O N S   ########################################
@@ -75,25 +75,27 @@ source("./r_code/functions_weather_data_for_ML_models.R")
 
 ##################################################################################################
 # Construct Mexico's shapefile (localidades only) from zip files.
+# This files includes ALL Mexican states. It creates the shapefile "mx_localities"
 setwd( path.git )
-source('mx_shapefile_construction.R')
+source('./r_code/mx_shapefile_construction.R')
 
 ##################################################################################################
 # Construct Mexico's shapefile (entidades and municipios) from zip files.
 setwd( path.git )
-source('mx_shapefile_construction_ent-mun.R')
+source('./r_code/mx_shapefile_construction_ent-mun.R')
 
 ##################################################################################################
 # Extract state-level information from footprint files
 setwd( path.git )
-source('subset_polygons_mx_hf.R')
+source('./r_code/subset_polygons_mx_hf.R')
 
 ##################################################################################################
 # Extract geocodes from MMP data for Mexican localities.
-# It loads Mexico's shapefile (which is very large)
+# It loads Mexico's shapefile (a very large file)
 # to create geocodes that combine ent, mun, and loc. Rural localities have their own geocode.
+# This files includes ONLY Mexican states in the MMP geocodes. It creates the shapefile "mx_localities_mmp"
 setwd( path.git )
-source('extract_geocode_mx_sh.R')
+source('./r_code/extract_geocode_mx_sh.R')
 
 ##################################################################################################
 # NOT CURRENTLY USED
@@ -103,18 +105,20 @@ source('extract_geocode_mx_sh.R')
 # source("hf2MMP.R")
 
 ##################################################################################################
-# IMPORTANT: This file needs access to dayment nc4 files. If unavailable, code will fail.
-#
-# Daily climate information is added to MMP based on matching geocodes extracted in
-# "extract_geocode_mx_sh.R"
-setwd( path.git )
-source("daymet_extraction_loc.R")
-
-##################################################################################################
+# IMPORTANT: 
+#           1. These two files need access to dayment nc4 files. If unavailable, code will fail.
+###
 # Daily climate information is extracted 
 # "extract_geocode_mx_sh.R"
 setwd( path.git )
-source("daymet_extraction_mun.R")
+source("./r_code/daymet_extraction_mun.R")
+#
+###
+# Daily climate information is added to MMP based on matching geocodes extracted in
+# "extract_geocode_mx_sh.R"
+setwd( path.git )
+source("./r_code/daymet_extraction_loc.R")
+
 
 ##################################################################################################
 # Create aggregate measure for MMP localities and csv files with climate information. It uses
