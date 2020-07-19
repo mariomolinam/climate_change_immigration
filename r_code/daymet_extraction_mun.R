@@ -1,17 +1,20 @@
 # read MMP geo codes
 setwd(path.git)
-mmp = read.csv("../mmp_w_footprint.csv")
+mmp = read.csv("../mmp.csv")
 # make geocodes characters
 mmp[,'geocode'] = as.character(mmp[,'geocode'])
 # add 0 to geocodes of length == 8; otherwise, do not change
-mmp[,'geocode'] = ifelse( nchar(mmp$geocode) == 8, paste0('0', mmp$geocode), mmp$geocode )
-
+mmp[,'geocode'] = ifelse( nchar(mmp$geocode) == 8, 
+                          paste0('0', mmp$geocode), mmp$geocode )
 
 # get Mexican localities
 setwd(path.shapefiles)
 cat('\n', 'Reading Mexican shapefiles...', '\n')
-mx.loc.mmp = readOGR(".", layer='mx_localities_mmp')
+mx.mun = readOGR("./mexican_shapefiles/", layer='mx_mun')
 cat('Done!', '\n')
+
+# add MUN geocode as a string
+mx.mun@data[,"geocode"] = as.character(mx.mun$CVEGEO)
 
 # get all daymet folders
 setwd(path.daymet)
@@ -27,12 +30,14 @@ for( folder in daymet_folders){
   # list all files inside folder
   all.files = list.files( folder )  
   
-  # create R object that will store all daymet values
-  geo.climate = as.character( mx.loc.mmp@data[,'geocode'] )
-  geo.climate = as.data.frame(geo.climate)
-  
   # loop over all files within folder
   for(t in 1:length(all.files)){
+  
+    # create R object that will store all daymet values
+    # NOTE: although this file does NOT change with the loop,
+    #       we need a new geo.climate at each iteration
+    geo.climate = as.character( mx.mun@data[,'geocode'] )
+    geo.climate = as.data.frame(geo.climate)
     
     # initialize proj.r
     if(t==1) proj.r = ""
@@ -47,13 +52,13 @@ for( folder in daymet_folders){
       # update projection
       proj.r = proj4string(r)
       # transform mx.loc.mmp 
-      mx.loc.mmp.trans = spTransform( mx.loc.mmp, proj.r )  
+      mx.mun.trans = spTransform( mx.mun, proj.r )  
     }
     cat('Done!', '\n')
     
     # loop over all raster layers in the brick raster
     cat('Loop over all raster...', '\n')
-    mx.coor = coordinates(mx.loc.mmp.trans)
+    mx.coor = coordinates(mx.mun.trans)
     for(i in 1:nlayers(r)){
       val.cells = cellFromXY(r[[i]], mx.coor)
       values = as.data.frame( r[[i]][val.cells] )
@@ -63,10 +68,14 @@ for( folder in daymet_folders){
     }
     # save as csv file after visiting all files in one folder
     year = sub('.*(\\d+{4}).*$','\\1',all.files[t])
-    file.name = paste0('mmp_',sub('./','', folder), year, '.csv')
+    file.name = paste0('mx-mun_',sub('./','', folder), year, '.csv')
     print(file.name)
     fwrite(x=geo.climate, file=file.name, append = TRUE)
     cat('Done!', '\n') 
+    
+    # remove items
+    rm(r, geo.climate, val.cells, values)
+    gc() # garbage collection
   }
 }
 
