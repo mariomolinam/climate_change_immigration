@@ -70,9 +70,9 @@ for(i in 1:length(all.files)){
 }
 
 # bind all layers together
-mx.layers = list.files('mx_sh/')
+mx.layers = list.files('./mexican_shapefiles/mx_sh/')
 mx.layers = unique(sub('[[:punct:]].*', '', mx.layers))
-mx.shapefile = do.call(raster::bind, lapply(mx.layers, function(x) readOGR("mx_sh/.", layer = x)))
+mx.shapefile = do.call(raster::bind, lapply(mx.layers, function(x) readOGR("./mexican_shapefiles/mx_sh/.", layer = x)))
 summary(mx.shapefile)
 
 # save shapefile

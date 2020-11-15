@@ -7,12 +7,10 @@ mmp[,'geocode'] = as.character(mmp[,'geocode'])
 mmp[,'geocode'] = ifelse( nchar(mmp$geocode) == 8, paste0('0', mmp$geocode), mmp$geocode )
 
 
-
 # get Mexican localities
 setwd(path.shapefiles)
 cat('\n', 'Reading Mexican shapefiles...', '\n')
-if(hostname=="molina") layer_mmp='mx_localities_mmp' else layer_mmp='mx_localities'
-mx.loc.mmp = readOGR(".", layer=layer_mmp)
+mx.loc.mmp = readOGR("./mexican_shapefiles/", layer="mx_localities_mmp")
 cat('Done!', '\n')
 
 # get all daymet folders
@@ -60,7 +58,7 @@ for( folder in daymet_folders){
     cat('Loop over all raster...', '\n')
     mx.coor = coordinates(mx.loc.mmp.trans)
     for(i in 1:nlayers(r)){
-      print(i)
+      if(i%%50==0) print(i)
       val.cells = cellFromXY(r[[i]], mx.coor)
       values = as.data.frame( r[[i]][val.cells] )
       colnames(values) = names(r[[i]])

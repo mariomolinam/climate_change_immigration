@@ -13,8 +13,9 @@ gc() # garbage collection
 # library(sp, lib=local.lib)
 # library(raster, lib=local.lib)
 # library(parallel, lib=local.lib)
+# library(foreach, lib=local.lib)
+# library(doParallel, lib=local.lib)
 # library(sf, lib=local.lib)
-# library(velox, lib=local.lib)
 # library(rgdal, lib=local.lib)
 # library(maps, lib=local.lib)
 # library(mapdata, lib=local.lib)
@@ -32,6 +33,8 @@ library(ncdf4) # read ncdf4 to read nc4 files
 library(readxl)
 library(raster)
 library(parallel)
+library(foreach)
+library(doParallel)
 library(sf)
 library(velox)
 library(rgdal)
@@ -61,7 +64,7 @@ if(hostname=="molina") {
   # In external drive
   path.daymet = "/media/mario/Seagate Backup Plus Drive/daymet_data"
 } else if(hostname=="sdl1"){
-  path.shapefiles = '/home/mm2535/documents/data/immigration_data'
+  path.shapefiles = '/home/mm2535/documents/data/climate_change'
   path.git = "/home/mm2535/documents/climate_change_immigration"
   path.daymet = "/home/mm2535/documents/data/climate_change/daymet"
   tmp = '/home/mm2535/documents/data/immigration_data/tmp_folder'
@@ -112,24 +115,23 @@ source('./r_code/extract_geocode_mx_sh.R')
 # "extract_geocode_mx_sh.R"
 setwd( path.git )
 source("./r_code/daymet_extraction_mun.R")
-#
+
 ###
 # Daily climate information is added to MMP based on matching geocodes extracted in
 # "extract_geocode_mx_sh.R"
 setwd( path.git )
 source("./r_code/daymet_extraction_loc.R")
 
-
 ##################################################################################################
-# Create aggregate measure for MMP localities and csv files with climate information. It uses
-# files from external drive
+# Create aggregate measure for MMP communities and all MEXICAN municipalities 
+# and csv files with climate information. It uses files from external drive
 setwd( path.git )
 source("climate_MMP.R")
 
 ##################################################################################################
 # Create plots based on human footprint and climate information
-setwd( path.git )
-source("create_plots.R")
+# setwd( path.git )
+# source("create_plots.R")
 
 ##################################################################################################
 # Create several climate change variables form ML models
