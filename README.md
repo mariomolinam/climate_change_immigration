@@ -15,3 +15,6 @@ Data for Mexico's map can be downloaded here: https://www.inegi.org.mx/app/mapas
 
 ### Dayment
 Daily climate measures for precipitation, minimum temperature, and maximum temperature (from 1980 to 2017) are taken from NASA Dayment and you can access the data [here](https://daymet.ornl.gov/)). To download the raster files for North America, you need to create an account first.
+
+### MMP
+You need to get access to the restricted data from the [Mexican Migration Project](https://mmp.opr.princeton.edu/), which includes geocodes for the communities available in the MMP data.
