@@ -7,6 +7,14 @@ Code in each programming language is stored in a separate folder (`r_code` and `
 
 ## Code
 
+### R code
+The `R` code does several operations needed before running random forests for the analysis. In particular:
+- It processes Mexico's shapefiles. 
+- It creates weather information using data from Dayment
+- It computes weather measures described on the paper and it creates files with these variables that will be used with the MMP data using `python` code.
+
+### Python code
+The `python` code runs the random forests using `scikit-learn`.
 
 
 ## Data
