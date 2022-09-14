@@ -2,16 +2,6 @@ import pandas as pd
 from define_paths import *
 import data_cleaning.functions_clean_data as func
 
-# # load data
-# filename = "ind161_w_env.csv"
-# full_path = path_data + '/' + filename
-# d = pd.read_csv(full_path, dtype="str")
-#
-# ############################################
-# # select columns and save as csv file
-# subset = func.select_columns(d)
-# subset.to_csv(path_data + "/ind161_w_env-subset.csv", index=False)
-# del d, subset # remove d from environment
 
 ############################################
 # load subset data
@@ -21,14 +11,26 @@ all = all.sort_values(by=["persnum", "year"])
 
 # list with weather files
 weather_data = [ x for x in os.listdir(path_data)
-                        if x.startswith("crude")
-                        or x.startswith("norm")
-                        or x.startswith("warm") ]
+                        if x.startswith("prcp")            # 1. raw prcp & 7. multiple days
+                        or x.startswith("crude")           # 2. raw tmax
+                        or x.startswith("norm_deviation")  # 3. long-term & 4. short-term norms
+                        or x.startswith("extremely")       # 3. long-term norm
+                        or x.startswith("norm_percent")    # 4. short-term norm
+                        or x.startswith("spell")           # 5. spells
+                        or x.startswith("warmest")         # 6. single days
+                        or x.startswith("coldest")         # 6. single days
+                        or x.startswith("max")             # 7. multiple days
+                        or x.startswith("total")           # 7. multiple days
+                        or x.startswith("tmax")            # 7. multiple days
+                        or x.startswith("tmin")            # 7. multiple days
+                        or x.startswith("perc")            # 8. percentage-based
+                        or x.startswith("gdd")             # 9. growing
+                        or x.startswith("hdd")             # 9. growing
+                        ]
+weather_data = [x for x in weather_data if "mun" not in x]
 
 
 ############################################
-# Create 3 different data structures
-data_struc_keys = ['long_noaug', 'long_aug', 'wide']
 
-# Create data structuresbased on keys from data_struc_keys
-func.create_data_structures(all, data_struc_keys, weather_data)
+# Create data structures based on keys from data_struc_keys
+func.create_data_structures(all, weather_data)
