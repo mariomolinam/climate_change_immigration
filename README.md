@@ -7,6 +7,11 @@ Code in each programming language is stored in a separate folder (`r_code` and `
 
 ## Code
 
+### R code
+The `R` code processes Mexico's shapefiles, creates weather information using data from Dayment, and it computes each measures
+
+### Python code
+The `python` code runs the random forests using `scikit-learn`.
 
 
 ## Data
