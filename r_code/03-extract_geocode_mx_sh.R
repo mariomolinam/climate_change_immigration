@@ -5,19 +5,29 @@
 # read MMP geo codes
 setwd(path.git)
 mmp = read_xlsx("../MMP161_community_identifiers_with_complete_geocodes-2.xlsx")
-mmp = mmp[1:170,] # remove tail
+mmp = mmp[1:170,] # remove tail from xlsx file
 mmp = as.data.frame(mmp)
 
-# make geocodes characters
+# turn geocodes into characters
 class(mmp[,'geocode']) = "character"
 # add 0 to geocodes of length == 8; otherwise, do not change
 mmp[,'geocode'] = ifelse( nchar(mmp$geocode) == 8, paste0('0', mmp$geocode), mmp$geocode )
 
-# REPLACE "lost" geocodes
-mmp[mmp$geocode=="210190045","geocode"] = "210190251"
-mmp[mmp$geocode=="190480056","geocode"] = "190480001"
-mmp[mmp$geocode=="160910024","geocode"] = "160910001"
-mmp[mmp$geocode=="110260080","geocode"] = "110260267"
+# REPLACE "lost" geocodes 
+#     NOTE: some geocodes in the MMP data do not match the geocodes in
+#         Mexican shapefiles, so they need to be corrected. For privacy reasons, 
+#         we cannot show those geocodes
+lost_geo_old = read.table("03-1-lost_geocodes_mmp_old.txt")
+lost_geo_new = read.table("03-2-lost_geocodes_mmp_new.txt")
+
+# we need characters
+class(lost_geo_old[,1]) = "character"
+class(lost_geo_new[,1]) = "character"
+
+mmp[mmp$geocode==lost_geo_old[1,],"geocode"] = lost_geo_new[1,]
+mmp[mmp$geocode==lost_geo_old[2,],"geocode"] = lost_geo_new[2,]
+mmp[mmp$geocode==lost_geo_old[3,],"geocode"] = lost_geo_new[3,]
+mmp[mmp$geocode==lost_geo_old[4,],"geocode"] = lost_geo_new[4,]
 
 
 ####################################################
