@@ -1,0 +1,21 @@
+,Non-migrants,Migrants,t statistic
+gdd_0,2500.52,2493.97,0.8
+gdd_1,2495.17,2489.39,0.7
+gdd_2,2490.29,2487.48,0.34
+gdd_3,2484.34,2476.43,0.97
+gdd_4,2477.77,2472.97,0.59
+coldest_day_0,17.56,18.31,-10.43
+coldest_day_1,17.79,18.31,-7.27
+coldest_day_2,17.94,18.17,-3.2
+coldest_day_3,18.09,18.12,-0.42
+coldest_day_4,18.07,18.18,-1.52
+warmest_day_0,35.2,35.05,3.23
+warmest_day_1,35.22,35.02,4.3
+warmest_day_2,35.03,34.91,2.61
+warmest_day_3,34.98,34.8,3.93
+warmest_day_4,34.87,34.79,1.79
+warmest_night_0,18.54,17.85,12.62
+warmest_night_1,18.35,17.86,8.94
+warmest_night_2,18.03,17.85,3.49
+warmest_night_3,17.82,17.75,1.37
+warmest_night_4,17.76,17.73,0.59
