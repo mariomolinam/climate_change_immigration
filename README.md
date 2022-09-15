@@ -7,7 +7,7 @@ We wrote an article together using this code, which was published at the Journal
 
 The code extracts weather data and creates weather measures used for the analyses. It also combines it with survey information from MMP (Mexican Migration Project), and run random-forests models to predict migration. The code for each programming language is stored in separate folders (`r_code` and `python_code`). A third folder `results` stores the results that appeared on the paper (figures and tables).
 
-*NOTE*: There is a lot of code in this repository. Although I tried to create master files (`00-master.R` and `run.py`) that help reproduce the results step by step and added comments to explain what almost all the code does, it may be difficult to navigate all the files. Please reach out if you have a hard time trying to understand some parts of the code. 
+**NOTE**: There is a lot of code in this repository. Although I tried to create master files (`00-master.R` and `run.py`) that help reproduce the results step by step and added comments to explain what almost all the code does, it may be difficult to navigate all the files. Please reach out if you have a hard time trying to understand some parts of the code. 
 
 ## Code
 
