@@ -11,103 +11,96 @@ import rf.plots_RF as plots
 
 ############################################################################################
 
-# DEFINE FILE NAMES
-file_names = sorted([ path_data + "/" + x for x in os.listdir(path_data) if "train" in x])
+### DEFINE FILE NAMES
+# Training
+file_names_train = [ path_data + "/" + x for x in os.listdir(path_data) if "train_set_wide" in x]
+f_train = file_names_train[0] # wide train data
+# Test
+file_names_test = sorted([ path_data + "/" + x for x in os.listdir(path_data) if "test_set_wide" in x])
+f_test = file_names_test[0] # wide train data
 
-# TYPES OF DATA STRUCTURE
-data_structure = sorted(["long_aug", "wide", "long_noaug"])
-weather_names = [ 'sociodemographics only',
-                  'crude_above30_tmax',
-                  'crude_raw_prcp',
-                  'crude_raw_tmax',
-                  'norm_dev_long',
-                  'norm_dev_short_prcp',
-                  'norm_dev_short_tmax',
-                  'norm_perc_short_prcp',
-                  'norm_perc_short_tmax',
-                  'warm_spell' ]
 
 # RUN RANDOM FORESTS (this will take a while...)
 #############################################
 
-# It runs 10 models for 3 different data structures using a Randomized grid search with Cross-validation.
-# It also includes different weight schemes for each model.
-models_output_rf = func_rf.run_RF(file_names, data_structure = "wide", model_type="rf")
-# use pickle to save RF
-with open(path_data+"/rf_models.pickle","wb") as f:
-    pickle.dump(models_output_rf, f, protocol=pickle.HIGHEST_PROTOCOL)
+# SAVE RANDOM FORESTS (RF) models
+if "rf_models.pickle" not in os.listdir(path_data):
+    with open(path_data+"/rf_models.pickle","wb") as f:
+        # Run random forest
+        models_output_rf = func_rf.run_RF(f_train, model_type="rf")
+        pickle.dump(models_output_rf, f, protocol=pickle.HIGHEST_PROTOCOL)
+else: # LOAD rf models
+    with open(path_data+"/rf_models.pickle","rb") as f:
+        models_output_rf = pickle.load(f)
 
-# Extract best models from RF grid search
-rf_best = func_rf.unpack_gridSearch(models_output_rf)
-
-# Calculate ROC values for each model
-roc_values_rf = ROC_curve_values(models_output_rf, model_type="rf", best_models=rf_best)
-
-# Calculate precision and recall scores for each model
-precision_recall = precision_recall_values(models_output_rf, model_type="rf", best_models=rf_best)
+f.close() # close file
 
 
 # RUN LOGISTIC REGRESSION
 #############################################
-models_output_lr = func_rf.run_RF(file_names, data_structure = "wide", model_type="lr")
-# use pickle to save Logistic Regressions
-with open(path_data+"/lr_models.pickle","wb") as f:
-    pickle.dump(models_output_lr, f, protocol=pickle.HIGHEST_PROTOCOL)
+# SAVE LOGISTIC REGRESSION (LR) models using pickle.dump
+if "lr_models.pickle" not in os.listdir(path_data):
+    with open(path_data+"/lr_models.pickle","wb") as f:
+        # Run logistic regression using baseline model only (model a)
+        models_output_lr = func_rf.run_RF(f_train, model_type="lr")
+        pickle.dump(models_output_lr, f, protocol=pickle.HIGHEST_PROTOCOL)
+else:
+    with open(path_data+"/lr_models.pickle","rb") as f:
+        models_output_lr = pickle.load(f)
+
+f.close() # close file
 
 
+################################
+###   T A B L E   3  (values)
+################################
+
+# VALIDATION SET
+# Random Forest
+final_models_rf = func_rf.eval_performance_rf(models_output_rf)
+
+# TEST SET for Random Forest AND Logistic Regression
+#############################################
+# Random Forest
+test_values_rf = func_rf.get_test_values(f_test, models_output_rf)
+performance_TEST_set_rf = func_rf.performance_test_set(final_models_rf, test_values_rf)
+
+# Logistic Regression
+test_values_lr = func_rf.get_test_values(f_test, models_output_lr)
+performance_TEST_set_lr = func_rf.performance_test_set(models_output_lr, test_values_lr)
+
+
+################################
+###   F I G U R E   3
+################################
 # Calculate ROC values for each model
-roc_values_lr = ROC_curve_values(output_list=models_output_lr, model_type="lr")
+roc_values_rf = func_rf.ROC_curve_values(final_models_rf, test_values_rf,model_type="rf")
 
-
-
-
-# P L O T
-#############################################
 # ROC curve and test under different ratio costs.
-plots.ROC_curve(roc_values, weather_names)
+plots.ROC_curve(roc_values_rf)
 
 
+################################
+###   F I G U R E   4
+################################
+# plot feature importance for all models
+plots.feature_importance_plot(final_models_rf, test_values_rf)
 
 
-# U R B A N   V S    R U R A L
-#############################################
-idx_rural_urban = idx_rural_urban(file_names, data_structure = "wide")
+################################
+###   F I G U R E   5
+################################
 
+# Permutation tests
+if "rf_perm_tests.pickle" not in os.listdir(path_data):
+    with open(path_data+"/rf_perm_tests.pickle","wb") as f:
+        # Run permutation tests for feature importance
+        perm_features = func_rf.perm_importance(final_models_rf, test_values_rf)
+        pickle.dump(perm_features, f, protocol=pickle.HIGHEST_PROTOCOL)
+    f.close() # close file
+else:
+    with open(path_data+"/rf_perm_tests.pickle","rb") as f:
+        perm_features = pickle.load(f)
 
-
-# precision-recall curve PLOT
-
-
-
-# y_test_list = get_y_test()
-# y_train_list = get_y_test()
-plots.ROC_sensitivity(rf_output_dict, y_test_list, weather_names)
-
-# Confusion Matrices: train and test set
-plots.confusion_matrices(rf_output_dict, y_train_list, y_test_list)
-
-
-
-
-
-
-###  I M P O R T A N C E S
-# Feature importance in predictive capacity
-importances_all = rf_output_dict['set_1'][0].feature_importances_
-std = np.std([tree.feature_importances_ for tree in rf_all.estimators_], axis=0)
-indices_all = np.argsort(importances_all)[::-1]
-features_sorted_all = [features_all[x] for x in indices_all]
-
-for f in range(X_all.shape[1]):
-    print("%d. feature %d (%f)" % (f + 1, indices_all[f], importances_all[indices_all[f]]))
-
-
-# Plot the feature importances of the forest
-plt.figure()
-plt.title("Feature Importances (Socio-demographics + Precipitation)")
-plt.bar(range(X_all.shape[1]), importances_all[indices_all],
-       color="r", yerr=std[indices_all], align="center", orientation="vertical")
-plt.xticks(range(X_all.shape[1]), features_sorted_all, rotation=90)
-plt.xlim([-1, X_all.shape[1]])
-fig_name = path_git + "/results/rf_features_importance_socio_prcp.png"
-plt.savefig(fig_name, bbox_inches='tight')
+# Plot results from permutation tests
+plots.feature_importance_permutation_plot(perm_features, test_values_rf)
