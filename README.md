@@ -3,7 +3,7 @@
 
 This repository contains `R` and `python` code for my project on climate change and migration in collaboration with Nancy Chau (Cornell University), Amanda D. Rodewald (Cornell University) and Filiz Garip (Princeton University). 
 
-We wrote an article together using this code, which was published at the Journal of Ethnic and Migration Studies in 2022 ([link to the article](https://doi.org/10.1080/1369183X.2022.2100549)).
+This project turned into a research article, titled "How to model the weather-migration link: a machine-learning approach to variable selection in the Mexico-U.S. context", and it was published at the Journal of Ethnic and Migration Studies in 2022 ([link to the article](https://doi.org/10.1080/1369183X.2022.2100549)).
 
 The code extracts weather data and creates weather measures used for the analyses. It also combines it with survey information from MMP (Mexican Migration Project), and run random-forests models to predict migration. The code for each programming language is stored in separate folders (`r_code` and `python_code`). A third folder `results` stores the results that appeared on the paper (figures and tables).
 
