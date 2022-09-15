@@ -3,20 +3,25 @@
 
 This repository contains `R` and `python` code for my project on climate change and migration in collaboration with Nancy Chau (Cornell University), Amanda D. Rodewald (Cornell University) and Filiz Garip (Princeton University). 
 
-We wrote a paper together based on this code, which is published at the Journal of Ethnic and Migration Studies ([link to the paper](https://doi.org/10.1080/1369183X.2022.2100549)).
+We wrote an article together using this code, which was published at the Journal of Ethnic and Migration Studies in 2022 ([link to the article](https://doi.org/10.1080/1369183X.2022.2100549)).
 
-This code extracts weather data and creates weather measures used for the analyses. It also combines it with survey information from MMP (Mexican Migration Project), and run random-forests models to predict migration. The code for each programming language is stored in separate folders (`r_code` and `python_code`). A third folder `results` includes results, which stores figures and tables produced using both `R` and `python`.
+The code extracts weather data and creates weather measures used for the analyses. It also combines it with survey information from MMP (Mexican Migration Project), and run random-forests models to predict migration. The code for each programming language is stored in separate folders (`r_code` and `python_code`). A third folder `results` includes results, which stores figures and tables produced using both `R` and `python`.
 
 ## Code
 
 ### R code
-The `R` code does several operations needed before running random forests for the analysis. In particular:
+
+The `R` code does several operations needed before running the random-forests models for the analysis. In particular:
 - It processes Mexico's shapefiles. 
 - It creates weather information using data from Dayment
 - It computes weather measures described on the paper and it creates files with these variables that will be used with the MMP data using `python` code.
+- It creates figure 2 on the paper.
 
 ### Python code
-The `python` code runs the random forests using `scikit-learn`.
+The `python` code runs random forests using `scikit-learn`. In particular, 
+- It manipulates the data containing the MMP survey and Daymet weather measures and prepares the data for the analysis.
+- It creates figures 3, 4, and 5 on the paper.
+- It gives the results presented in tables 2 and 3 on the paper.
 
 
 ## Data
