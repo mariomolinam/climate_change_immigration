@@ -1,5 +1,5 @@
 
-##################### SHAPEFILE MEXICO
+# SHAPEFILE MEXICO
 setwd(path.shapefiles)
 
 
@@ -23,15 +23,6 @@ for(i in 1:length(all.files)){
   # remove island query if non-existent
   if( length(grep('territorio_insular', files)) == 0 ) pattern = pattern[-length(pattern)]
   
-  # # load object if it exists
-  # if(i > 1){
-  #   cat('Loading shapefile object...', '\n\n')
-  #   shapefile = readOGR(dsn='mx_sh/.', layer='mx_loc')
-  #   cat('Done!', '\n\n')
-  # }
-  
-  # if(i==21) pattern = c(pattern,"lpr")
-  
   # loop over shapefiles
   for(l in 1:length(pattern)){
     # read shapefile
@@ -51,7 +42,7 @@ for(i in 1:length(all.files)){
     }
     # delete tmp folder
     unlink('./mexican_shapefiles/tmp_folder/', recursive = TRUE)
-    # summary info shapefile
+    # summary for info shapefile
     print(summary(shapefile))
     
     # store object

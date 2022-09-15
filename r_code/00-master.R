@@ -4,30 +4,6 @@
 rm(list = ls())
 gc() # garbage collection
 
-#################################   L I B R A R I E S   ########################################
-###  I F   I N    S D L  1
-# libraries
-# local.lib = '/home/mm2535/R/x86_64-pc-linux-gnu-library'
-# 
-# library(readxl, lib=local.lib)
-# library(sp, lib=local.lib)
-# library(raster, lib=local.lib)
-# library(parallel, lib=local.lib)
-# library(foreach, lib=local.lib)
-# library(doParallel, lib=local.lib)
-# library(sf, lib=local.lib)
-# library(rgdal, lib=local.lib)
-# library(maps, lib=local.lib)
-# library(mapdata, lib=local.lib)
-# library(crayon, lib=local.lib)
-# library(withr, lib=local.lib)
-# library(ggplot2, lib=local.lib)
-# library(rgeos, lib=local.lib)
-# library(ggmap, lib=local.lib)
-# library(data.table, lib=local.lib)
-# library(ncdf4, lib=local.lib)
-
-
 # call libraries
 library(ncdf4) # read ncdf4 to read nc4 files
 library(readxl)
@@ -76,74 +52,61 @@ if(hostname=="molina") {
 setwd(path.git)
 source("./r_code/functions_weather_data_for_ML_models.R")
 
-##################################################################################################
+
+#### M E X I C A N   S H A P E F I L E S
+#####################################################
+
 # Construct Mexico's shapefile (localidades only) from zip files.
 # This files includes ALL Mexican states. It creates the shapefile "mx_localities"
 setwd( path.git )
-source('./r_code/mx_shapefile_construction.R')
+source('./r_code/01-mx_shapefile_construction.R')
 
-##################################################################################################
-# Construct Mexico's shapefile (entidades and municipios) from zip files.
+# Construct Mexico's shapefile (entidades and municipios) from zip files. 
+# These files can be used for visualization.
 setwd( path.git )
-source('./r_code/mx_shapefile_construction_ent-mun.R')
-
-##################################################################################################
-# Extract state-level information from footprint files
-setwd( path.git )
-source('./r_code/subset_polygons_mx_hf.R')
-
-##################################################################################################
+source('./r_code/02-mx_shapefile_construction_ent-mun.R')
+n
 # Extract geocodes from MMP data for Mexican localities.
-# It loads Mexico's shapefile (a very large file)
+# It loads Mexico's shapefile (a large file)
 # to create geocodes that combine ent, mun, and loc. Rural localities have their own geocode.
 # This files includes ONLY Mexican states in the MMP geocodes. It creates the shapefile "mx_localities_mmp"
 setwd( path.git )
-source('./r_code/extract_geocode_mx_sh.R')
+source('./r_code/03-extract_geocode_mx_sh.R')
 
-##################################################################################################
-# NOT CURRENTLY USED
-# Human footprints are added to MMP based on matching geocodes extracted in
-# "extract_geocode_mx_sh.R". This file also relies on objects created in "extract_geocode_mx_sh.R".
-# setwd( path.git )
-# source("hf2MMP.R")
 
-##################################################################################################
-# IMPORTANT: 
-#           1. These two files need access to dayment nc4 files. If unavailable, code will fail.
-###
-# Daily climate information is extracted 
-# "extract_geocode_mx_sh.R"
+#### D A Y M E T
+#####################################################
+
+# IMPORTANT NOTE: 
+#     - The following two files need access to dayment nc4 files. If unavailable, code will fail.
+#       These files are large and the tasks will take a long time to run (~ 2-3 days)
+#
+# Daily climate information is extracted
 setwd( path.git )
-source("./r_code/daymet_extraction_mun.R")
-
-###
-# Daily climate information is added to MMP based on matching geocodes extracted in
-# "extract_geocode_mx_sh.R"
+source("./r_code/04-daymet_extraction_mun.R")
+#
+# Daily climate information is added to MMP based on matching geocodes extracted 
+# in file "03-extract_geocode_mx_sh.R" (see above)
 setwd( path.git )
-source("./r_code/daymet_extraction_loc.R")
+source("./r_code/05-daymet_extraction_loc.R")
+
+# Create aggregate measures for MMP communities and all MEXICAN municipalities 
+# and csv files with climate information.
+setwd( path.git )
+source("./r_code/06-climate_MMP.R")
+
+
+
+#### V A R I A B L E   C O N S T R U C T I O N   
+####        F O R   M L   M O D E L S
+#####################################################
 
 ##################################################################################################
-# Create aggregate measure for MMP communities and all MEXICAN municipalities 
-# and csv files with climate information. It uses files from external drive
+# Create several weather variables for ML models. This file calls several other files.
 setwd( path.git )
-source("climate_MMP.R")
-
-##################################################################################################
-# Create plots based on human footprint and climate information
-# setwd( path.git )
-# source("create_plots.R")
-
-##################################################################################################
-# Create several climate change variables form ML models
-setwd( path.git )
-source("create_weather_data_for_ML_models.R")
-
-##################################################################################################
-# Extract geocodes from crossing points for Mexican municipalities
-setwd( path.git )
-source("extract_geocode_crossing_points.R")
+source("07-00-create_weather_data_for_ML_models.R")
 
 ##################################################################################################
 # Graph migration over time in Mexico's map (using all MMP data)
 setwd( path.git )
-source("plot_migration_over_time_mexico_map.R")
+source("08-plot_migration_over_time_mexico_map.R")

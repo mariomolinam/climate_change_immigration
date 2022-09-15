@@ -26,14 +26,14 @@ crop = fread("./Mexico crop data/top_crops_sorted_w_info.csv")
 #             - yearly average total amount of rain per month
 #             - yearly average amount of rain per day 
 setwd(path.git)
-source("./r_code/raw_prcp.R")
+source("./r_code/07-01-raw_prcp.R")
 
 # 2. RAW TMAX:
 #             - Yearly average temperature per month
 #             - Yearly average of # of days above 30C per month.
 #             - Yearly average of # CONSECUTIVE of days above 30C per month.
 setwd(path.git)
-source("./r_code/raw_tmax.R")
+source("./r_code/07-02-raw_tmax.R")
 
 # 3. LONG-TERM NORM (1960-1979):
 #             - For precipitation only (Tmax not available). Data coming from MMP environment data.
@@ -41,7 +41,7 @@ source("./r_code/raw_tmax.R")
 #             - Norm deviations are normalized by SD.
 #             - Extremely Wet Days: Annual total precip from days when precip > 99th percentile.
 setwd(path.git)
-source("./r_code/norm_long-term.R")
+source("./r_code/07-03-norm_long-term.R")
 
 # 4. SHORT-TERM NORM:
 #             - Baseline prcp is total precipitation averaged over months (operation is "sum").
@@ -49,7 +49,7 @@ source("./r_code/norm_long-term.R")
 #             - Norm deviations are normalized by SD.
 #             - Proportion of months above the norm
 setwd(path.git)
-source("./r_code/norm_short-term.R")
+source("./r_code/07-04-norm_short-term.R")
 
 
 # 5. SPELLS (WARM, WET and COLD):
@@ -60,7 +60,7 @@ source("./r_code/norm_short-term.R")
 #               10th percentile of short-term norm (tmin).
 
 setwd(path.git)
-source("./r_code/spells.R")
+source("./r_code/07-05-spells.R")
 
 
 # 6. SINGLE-DAY MEASURES:
@@ -68,7 +68,7 @@ source("./r_code/spells.R")
 #             - ANNUAL COLDEST DAY: Annual min value of daily max temperature
 #             - ANNUAL WARMEST NIGHT: Annual max value of daily min temperature
 setwd(path.git)
-source("./r_code/single-days.R")
+source("./r_code/07-06-single-days.R")
 
 
 # 7. MULTIPLE-DAY MEASURES:
@@ -76,17 +76,17 @@ source("./r_code/single-days.R")
 #             - HEAVY PRCP: Annual count of days when precip > 20mm (> 2cm)
 #             - MAX 5-DAY PRCP: Annual max consecutive 5-day precipitation amount
 setwd(path.git)
-source("./r_code/multiple-days.R")
+source("./r_code/07-07-multiple-days.R")
 
 
 # 8. PERCENTAGE-BASED MEASURES:
 setwd(path.git)
-source("./r_code/percentage_based.R")
+source("./r_code/07-08-percentage_based.R")
 
 
 # 9. GROWING SEASON MEASURES (May 1 - Oct 31)
 setwd(path.git)
-source("./r_code/growing_measures.R")
+source("./r_code/07-09-growing_measures.R")
 
 
 # DEVIATIONS FROM WEATHER INFORMATION BASED ON CROPS

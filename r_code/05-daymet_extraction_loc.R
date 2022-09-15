@@ -1,6 +1,6 @@
 # read MMP geo codes
 setwd(path.git)
-mmp = read.csv("../mmp.csv")
+mmp = read.csv("../data/mmp.csv")
 # make geocodes characters
 mmp[,'geocode'] = as.character(mmp[,'geocode'])
 # add 0 to geocodes of length == 8; otherwise, do not change

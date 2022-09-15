@@ -137,9 +137,9 @@ perc_change_prcp = function(data, weather, operation){
   
   # percentual change relative to norm
   years = paste(1985:2017)
-  weather_yearly = sapply(years, function(x) {
+  weather_yearly = sapply(years, function(y) {
     # subset weather_monthly by year
-    chunk = weather_monthly[,grep(x,colnames(weather_monthly))]
+    chunk = weather_monthly[,grep(y,colnames(weather_monthly))]
     # calculate proportion of months in a year above the norm
     change = rowMeans(chunk - weather_norm[,"norm_mean"]) / weather_norm[,"norm_mean"]
     # convert decrease in rain to increase in dryness 
@@ -154,7 +154,8 @@ perc_change_prcp = function(data, weather, operation){
   # update column names
   colnames(weather_yearly) = c("geocode", "state",
                                paste0("perc_change-", weather, "-", years))
-  
+ 
+  return(weather_yearly) 
 }
 
 

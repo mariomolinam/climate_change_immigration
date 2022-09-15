@@ -34,14 +34,14 @@ for( folder in daymet_folders){
   # parallel computing setup
   cat("\n Starting parallel computing...")
   cores=detectCores()
-  cl = makeCluster(cores-1) #not to overload your computer
+  cl = makeCluster(cores-1) # to avoid overloading your computer
   registerDoParallel(cl)
   # add local path lo load libraries from (only if in sdl1)
   if(hostname=="sdl1") {
     clusterEvalQ(cl, .libPaths('/home/mm2535/R/x86_64-pc-linux-gnu-library'))
   }
   
-  # loop over all files within folder
+  # loop over all files in the folder
   for(t in 1:length(all.files)){
   
     # initialize proj.r

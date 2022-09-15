@@ -87,7 +87,7 @@ write.csv( x = crude_weather_yearly(data=prcp.mmp, weather="prcp", operation="me
 write.csv( x = annual_maximum(data=prcp.mmp, weather="prcp", operation="mean"),
            file = "./mmp_data/prcp_maximum_yearly_mmp_1980-2017.csv", row.names = FALSE )
 
-# Data: Annual maximum precipitation (as averaged over days in a month).
+# Data: Annual minimum precipitation (as averaged over days in a month).
 #       We take the maximum monthly average value over the year
 write.csv( x = annual_minimum(data=prcp.mmp, weather="prcp", operation="mean"),
            file = "./mmp_data/prcp_minimum_yearly_mmp_1980-2017.csv", row.names = FALSE )
