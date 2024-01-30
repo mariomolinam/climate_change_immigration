@@ -15,15 +15,15 @@ The code extracts weather data and creates weather measures used for the analyse
 
 The `R` code does several operations needed before running the random-forests models for the analysis. In particular:
 - It processes Mexico's shapefiles. 
-- It creates weather information using data from Dayment
+- It creates weather information using data from Dayment.
 - It computes weather measures described on the paper and it creates files with these variables that will be used with the MMP data using `python` code.
-- It creates figure 2 on the paper.
+- It creates Figure 2 on the paper.
 
 ### Python code
 The `python` code runs random forests using `scikit-learn`. In particular, 
 - It manipulates the data containing the MMP survey and Daymet weather measures and prepares the data for the analysis.
-- It creates figures 3, 4, and 5 on the paper.
-- It gives the results presented in tables 2 and 3 on the paper.
+- It creates Figures 3, 4, and 5 on the paper.
+- It gives the results presented in Tables 2 and 3 on the paper.
 
 
 ## Data
@@ -31,8 +31,8 @@ The `python` code runs random forests using `scikit-learn`. In particular,
 ### Mexican Shapefiles
 Data for Mexico's map can be downloaded here: https://www.inegi.org.mx/app/mapas/. This project uses the "Marco Geoestaditico, febrero 2018", and it can be accessed using [this link](https://www.inegi.org.mx/contenidos/productos/prod_serv/contenidos/espanol/bvinegi/productos/geografia/marcogeo/889463526636_s.zip). (**NOTE**: If you click on this link, you will start downloading the Mexican shapefiles (~3Gb) right away.)
 
-### Dayment
-Daily climate measures for precipitation, minimum temperature, and maximum temperature (from 1980 to 2017) are taken from NASA Dayment and you can access the data [here](https://daymet.ornl.gov/)). To download the raster files for North America, you need to create an account first.
+### Daymet
+Daily climate measures for precipitation, minimum temperature, and maximum temperature (from 1980 to 2017) are taken from NASA Daymet and you can access the data [here](https://daymet.ornl.gov/)). To download the raster files for North America, you need to create an account first.
 
 ### Mexican Migration Project
 You need to get access to the restricted data from the [Mexican Migration Project](https://mmp.opr.princeton.edu/), which includes geocodes for the communities available in the MMP data.
